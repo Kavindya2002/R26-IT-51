@@ -1,0 +1,11 @@
+flask
+flask-cors
+paho-mqtt>=2.0
+python-dotenv
+numpy
+opencv-python
+# YOLO object detection on the ESP32-CAM stream (optional - the server still runs without it)
+ultralytics
+# only needed for tools/data_labeller.py (the Streamlit dataset-labelling tool)
+pandas
+streamlit

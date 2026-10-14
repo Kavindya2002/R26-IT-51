@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elder Movement Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:       #080c10;
+  --panel:    #0d1117;
+  --card:     #111820;
+  --border:   #1e2a38;
+  --green:    #00ff88;
+  --yellow:   #ffcc00;
+  --red:      #ff3333;
+  --blue:     #1a6aff;
+  --text:     #c8d6e5;
+  --muted:    #556070;
+  --mono:     'Share Tech Mono', monospace;
+  --sans:     'Rajdhani', sans-serif;
+}
+
+body { overflow:hidden; font-family:var(--sans); background:var(--bg); color:var(--text); }
+#app { display:flex; width:100vw; height:100vh; }
+
+/* ── VIEWER ── */
+#viewer { flex:1; position:relative; }
+#viewer canvas { display:block; }
+
+#hud {
+  position:absolute; top:16px; left:16px;
+  font-family:var(--mono); font-size:11px;
+  color:var(--green); line-height:1.8;
+  pointer-events:none; text-shadow:0 0 8px var(--green);
+}
+
+/* prediction overlay on 3D canvas */
+#predOverlay {
+  position:absolute; bottom:24px; left:50%;
+  transform:translateX(-50%); text-align:center; pointer-events:none;
+}
+
+#predLabel {
+  font-family:var(--mono); font-size:22px;
+  letter-spacing:3px; text-transform:uppercase;
+  color:var(--green); text-shadow:0 0 20px var(--green);
+  transition:color 0.3s, text-shadow 0.3s;
+}
+
+#predConf {
+  font-family:var(--mono); font-size:11px;
+  color:var(--muted); margin-top:4px; letter-spacing:1px;
+}
+
+/* red border flash on fall */
+#fallAlert {
+  position:absolute; inset:0; pointer-events:none;
+  border:3px solid transparent; transition:border-color 0.1s, background 0.1s;
+}
+
+#fallAlert.active {
+  border-color:var(--red); background:rgba(255,51,51,0.05);
+  animation:alertPulse 0.6s ease-in-out infinite;
+}
+
+@keyframes alertPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── PANEL ── */
+#panel {
+  width:380px; background:var(--panel);
+  border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+
+#panelScroll {
+  flex:1; overflow-y:auto; padding:20px;
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+
+.panel-title {
+  font-family:var(--sans); font-weight:700; font-size:20px;
+  letter-spacing:2px; text-transform:uppercase; color:#fff; margin-bottom:4px;
+}
+
+.panel-sub {
+  font-family:var(--mono); font-size:10px; color:var(--muted);
+  letter-spacing:1px; margin-bottom:18px;
+}
+
+.card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:10px; padding:14px 16px; margin-bottom:12px;
+}
+
+.card-label {
+  font-family:var(--mono); font-size:10px; color:var(--muted);
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:8px;
+}
+
+.status-row { display:flex; align-items:center; gap:8px; }
+.dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; }
+.dot.connected  { background:var(--green); box-shadow:0 0 6px var(--green); }
+.dot.error      { background:var(--red);   box-shadow:0 0 6px var(--red); }
+.dot.connecting { background:var(--yellow); animation:pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+#statusText { font-family:var(--mono); font-size:12px; color:var(--text); }
+
+.metric-big { font-family:var(--mono); font-size:32px; font-weight:normal; color:#fff; letter-spacing:1px; }
+.bar { width:100%; height:6px; background:#0a0f14; border-radius:4px; overflow:hidden; margin-top:10px; }
+.fill { height:100%; width:0%; border-radius:4px; transition:width 0.12s ease, background 0.3s; }
+.metric-note { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:6px; }
+
+.sensor-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.sensor-item { background:#0a0f14; border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; }
+.sensor-key  { font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:1px; }
+.sensor-val  { font-family:var(--mono); font-size:13px; color:var(--text); margin-top:2px; }
+
+.orient-row { display:flex; gap:10px; }
+.orient-box { flex:1; background:#0a0f14; border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center; }
+.orient-key { font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:1px; }
+.orient-val { font-family:var(--mono); font-size:18px; color:#fff; margin-top:4px; }
+
+/* ── PREDICTION CARD ── */
+.pred-main { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+
+.pred-label-big {
+  font-family:var(--mono); font-size:18px;
+  color:#fff; letter-spacing:1px; text-transform:uppercase;
+  transition: color 0.3s;
+}
+
+.pred-conf-pill {
+  font-family:var(--mono); font-size:11px;
+  padding:3px 9px; border-radius:20px;
+  background:#0a0f14; border:1px solid var(--border); color:var(--muted);
+}
+
+.prob-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.prob-name {
+  font-family:var(--mono); font-size:10px; color:var(--muted);
+  width:110px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.prob-bar-wrap { flex:1; height:5px; background:#0a0f14; border-radius:4px; overflow:hidden; }
+.prob-bar-fill { height:100%; border-radius:4px; background:var(--green); transition:width 0.2s ease, background 0.2s; }
+.prob-pct { font-family:var(--mono); font-size:10px; color:var(--muted); width:34px; text-align:right; flex-shrink:0; }
+
+.buf-row { display:flex; align-items:center; gap:8px; margin-top:10px; }
+.buf-label { font-family:var(--mono); font-size:10px; color:var(--muted); white-space:nowrap; }
+.buf-dots { display:flex; gap:3px; flex-wrap:wrap; }
+.buf-dot { width:6px; height:6px; border-radius:1px; background:var(--border); transition:background 0.1s; }
+.buf-dot.filled { background:var(--green); }
+
+/* history */
+.hist-item {
+  display:flex; align-items:center; gap:8px;
+  padding:5px 0; border-bottom:1px solid var(--border);
+  font-family:var(--mono); font-size:10px;
+}
+.hist-time  { color:var(--muted); flex-shrink:0; }
+.hist-tag   { padding:2px 6px; border-radius:4px; text-transform:uppercase; letter-spacing:1px; flex-shrink:0; }
+.hist-conf  { color:var(--muted); margin-left:auto; }
+
+/* server status */
+.srv-row { display:flex; align-items:center; gap:8px; }
+.srv-dot { width:7px; height:7px; border-radius:50%; background:var(--muted); flex-shrink:0; transition:background 0.3s; }
+.srv-dot.ok      { background:var(--green); box-shadow:0 0 5px var(--green); }
+.srv-dot.err     { background:var(--red); box-shadow:0 0 5px var(--red); }
+.srv-dot.waiting { background:var(--yellow); animation:pulse 1s ease-in-out infinite; }
+#srvText { font-family:var(--mono); font-size:11px; color:var(--text); }
+
+#recBar {
+  padding:10px 20px; background:#0a0f14; border-top:1px solid var(--border);
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+
+
+/* ── POSTURE DECISION ── */
+.gauge{position:relative;height:8px;background:#0a0f14;border-radius:4px;margin:14px 0 22px;}
+.gauge-fill{height:100%;border-radius:4px;width:0;transition:width .12s,background .2s;}
+.gauge-mark{position:absolute;top:-4px;width:2px;height:16px;background:#8895a5;}
+.gauge-mark span{position:absolute;top:18px;left:50%;transform:translateX(-50%);font:9px var(--mono);color:var(--muted);white-space:nowrap;}
+.why{margin-top:6px;padding:10px 12px;background:#0a0f14;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:11px;line-height:1.6;color:var(--text);}
+.note{margin-top:8px;font-family:var(--mono);font-size:10px;line-height:1.5;color:var(--yellow);}
+.set-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin:10px 0 4px;}
+.set-row b{color:#fff;font-weight:normal;}
+input[type=range]{width:100%;accent-color:var(--green);}
+.btn{margin-top:12px;width:100%;padding:8px;background:#0a0f14;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:11px;letter-spacing:2px;cursor:pointer;}
+.btn:hover{border-color:var(--green);color:var(--green);}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="viewer">
+    <div id="hud">
+      <div>PITCH &nbsp;<span id="hudPitch">0.0</span>°</div>
+      <div>ROLL &nbsp;&nbsp;<span id="hudRoll">0.0</span>°</div>
+      <div>MAG &nbsp;&nbsp;&nbsp;<span id="hudMag">0.00</span></div>
+    </div>
+    <div id="predOverlay">
+      <div id="predLabel">— WAITING —</div>
+      <div id="predConf"></div>
+    </div>
+    <div id="fallAlert"></div>
+  </div>
+
+  <div id="panel">
+    <div id="panelScroll">
+
+      <div class="panel-title">Elder Prevention AI</div>
+      <div class="panel-sub">LIVE FALL DETECTION · RF MODEL + ANGLE LOGIC</div>
+
+      <!-- MQTT -->
+      <div class="card">
+        <div class="card-label">MQTT STATUS</div>
+        <div class="status-row">
+          <div class="dot connecting" id="statusDot"></div>
+          <div id="statusText">connecting...</div>
+        </div>
+      </div>
+
+      <!-- SERVER -->
+      <div class="card">
+        <div class="card-label">PREDICTION SERVER</div>
+        <div class="srv-row">
+          <div class="srv-dot waiting" id="srvDot"></div>
+          <div id="srvText">checking localhost:5050…</div>
+        </div>
+      </div>
+
+      <!-- POSTURE DECISION (angle logic + AI) -->
+      <div class="card">
+        <div class="card-label">POSTURE DECISION</div>
+        <div class="pred-main">
+          <div class="pred-label-big" id="postLevel">UPRIGHT</div>
+          <div class="pred-conf-pill" id="postAngle">0°</div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-fill" id="gFill"></div>
+          <div class="gauge-mark" id="gSafe"><span id="gSafeT"></span></div>
+          <div class="gauge-mark" id="gFall" style="background:#ff3333"><span id="gFallT"></span></div>
+        </div>
+        <div class="why" id="postWhy">Waiting for sensor data…</div>
+        <div class="note" id="postNote"></div>
+      </div>
+
+      <!-- LIVE PREDICTION -->
+      <div class="card">
+        <div class="card-label">LIVE PREDICTION</div>
+        <div class="pred-main">
+          <div class="pred-label-big" id="predLabelPanel">—</div>
+          <div class="pred-conf-pill" id="predConfPanel">—</div>
+        </div>
+        <div id="probBars"></div>
+        <div class="buf-row">
+          <div class="buf-label">BUFFER</div>
+          <div class="buf-dots" id="bufDots"></div>
+        </div>
+      </div>
+
+      <!-- CONTEXT AWARENESS -->
+<div class="card">
+  <div class="card-label">CONTEXT AWARENESS</div>
+
+  <div style="margin-bottom:12px;">
+    <div class="sensor-key">PREVIOUS ACTIVITY</div>
+    <div class="orient-val" id="ctxActivity">—</div>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <div class="sensor-key">STABILITY STATE</div>
+    <div class="orient-val" id="ctxStability">—</div>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <div class="sensor-key">FALL DIRECTION</div>
+    <div class="orient-val" id="ctxDirection">—</div>
+  </div>
+
+  <div>
+    <div class="sensor-key">AI INTERPRETATION</div>
+
+    <div id="ctxMessage"
+      style="
+        margin-top:8px;
+        padding:12px;
+        background:#0a0f14;
+        border:1px solid var(--border);
+        border-radius:8px;
+        font-family:var(--mono);
+        font-size:11px;
+        line-height:1.6;
+        color:var(--text);
+      ">
+      Waiting for context...
+    </div>
+  </div>
+</div>
+
+      <!-- HISTORY -->
+      <div class="card">
+        <div class="card-label">PREDICTION HISTORY</div>
+        <div id="histList" style="max-height:130px;overflow-y:auto;scrollbar-width:thin;">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;padding:12px 0;">
+            Waiting for predictions…
+          </div>
+        </div>
+      </div>
+
+      <!-- FALL LOGIC SETTINGS -->
+      <div class="card">
+        <div class="card-label">FALL LOGIC SETTINGS</div>
+        <div class="set-row"><span>SAFE TILT LIMIT</span><b id="safeVal">30°</b></div>
+        <input type="range" id="safeRange" min="20" max="50" value="30">
+        <div class="set-row"><span>FALL ANGLE</span><b id="fallVal">40°</b></div>
+        <input type="range" id="fallRange" min="30" max="80" value="40">
+        <button class="btn" id="resetBtn">RESET ALERT</button>
+      </div>
+
+      <!-- ALERT LOG -->
+      <div class="card">
+        <div class="card-label">POSTURE EVENT LOG</div>
+        <div id="alertList" style="max-height:130px;overflow-y:auto;scrollbar-width:thin;">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;padding:12px 0;">No events yet…</div>
+        </div>
+      </div>
+
+      <!-- MOVEMENT -->
+      <div class="card">
+        <div class="card-label">MOVEMENT MAGNITUDE</div>
+        <div class="metric-big" id="mag">0.00</div>
+        <div class="bar"><div class="fill" id="magFill" style="background:var(--green);"></div></div>
+      </div>
+
+      <!-- STABILITY -->
+      <div class="card">
+        <div class="card-label">STABILITY SCORE</div>
+        <div class="metric-big" id="stability">100%</div>
+        <div class="bar"><div class="fill" id="stabFill" style="background:var(--green);width:100%;"></div></div>
+        <div class="metric-note">Lower = unstable movement</div>
+      </div>
+
+      <!-- ORIENTATION -->
+      <div class="card">
+        <div class="card-label">BODY ORIENTATION</div>
+        <div class="orient-row">
+          <div class="orient-box">
+            <div class="orient-key">PITCH</div>
+            <div class="orient-val" id="pitch">0.0°</div>
+          </div>
+          <div class="orient-box">
+            <div class="orient-key">ROLL</div>
+            <div class="orient-val" id="roll">0.0°</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SENSORS -->
+      <div class="card">
+        <div class="card-label">SENSOR DATA</div>
+        <div class="sensor-grid">
+          <div class="sensor-item"><div class="sensor-key">AX</div><div class="sensor-val" id="ax">0.00</div></div>
+          <div class="sensor-item"><div class="sensor-key">AY</div><div class="sensor-val" id="ay">0.00</div></div>
+          <div class="sensor-item"><div class="sensor-key">AZ</div><div class="sensor-val" id="az">0.00</div></div>
+          <div class="sensor-item"><div class="sensor-key">GX</div><div class="sensor-val" id="gx">0.00</div></div>
+          <div class="sensor-item"><div class="sensor-key">GY</div><div class="sensor-val" id="gy">0.00</div></div>
+          <div class="sensor-item"><div class="sensor-key">GZ</div><div class="sensor-val" id="gz">0.00</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="recBar">
+      <span id="recBarText">IDLE — WAITING FOR DATA</span>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script>
+
+// =========================================================
+//  CONFIG
+// =========================================================
+
+const MQTT_HOST  = "ws://p66a0b41.ala.dedicated.aws.emqxcloud.com:8083/mqtt";
+const MQTT_USER  = "kavindya";
+const MQTT_PASS  = "123456";
+const MQTT_TOPIC = "elder/device01/imu";
+
+const SERVER_URL  = "http://localhost:5050";
+const WINDOW_SIZE = 20;   // must match training
+const PRED_EVERY  = 10;   // predict every N new samples
+
+// ---- FALL DECISION LOGIC (tilt angle measured from upright, in degrees) ----
+// Thresholds come from the collected dataset: walking/standing reach ~25° at most,
+// real falls go well beyond that.
+const LOGIC = {
+  slightTilt : 15,    // below this  -> UPRIGHT
+  safeTilt   : 30,    // 15..30      -> SLIGHT TILT (normal, NOT a fall)
+                      // 30..fallTilt-> LOSING BALANCE (early risk warning, NOT a fall yet)
+  fallTilt   : 40,    // >= this (held for `dwell` samples) -> FALL
+  mlMinConf  : 0.60,  // AI model fall prediction counts only above this confidence ...
+                      // ... AND only if tilt >= safeTilt
+  dwell      : 2,     // consecutive samples (100 ms each) needed -> ignores one-sample spikes
+  recoverTilt: 20,    // person must come back below this ...
+  recoverSamples: 10, // ... for this many samples (1 s) to clear a fall
+  holdMs     : 3000   // minimum time a fall alert stays on screen
+};
+const MIRROR_LR = true;   // set false if the avatar leans the wrong way left/right
+
+// =========================================================
+//  STATE
+// =========================================================
+
+let imu              = { ax:0, ay:1, az:0, gx:0, gy:0, gz:0, mag:1 };
+let decision         = { level:0, hex:"#00ff88" };
+let sampleBuffer     = [];
+let predClasses      = [];
+let lastPrediction   = null;
+let predHistory      = [];
+let samplesSincePred = 0;
+let serverOk         = false;
+let predInFlight     = false;
+
+
+// =========================================================
+//  THREE.JS
+// =========================================================
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x080c10);
+scene.fog        = new THREE.FogExp2(0x080c10, 0.06);
+
+const camera = new THREE.PerspectiveCamera(55, (window.innerWidth-380)/window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2.5, 7);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth-380, window.innerHeight);
+document.getElementById("viewer").appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+const dir = new THREE.DirectionalLight(0xffffff, 1);
+dir.position.set(5, 10, 5);
+scene.add(dir);
+scene.add(new THREE.GridHelper(30, 30, 0x1e2a38, 0x111820));
+
+const human   = new THREE.Group();
+scene.add(human);
+
+const matBody = new THREE.MeshStandardMaterial({ color:0x00ff88, roughness:0.4, metalness:0.1 });
+const matHead = new THREE.MeshStandardMaterial({ color:0xffcc99, roughness:0.6 });
+const matLimb = new THREE.MeshStandardMaterial({ color:0x334455, roughness:0.5 });
+
+const body = new THREE.Mesh(new THREE.BoxGeometry(1,2,0.5), matBody);
+human.add(body);
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.35,32,32), matHead);
+head.position.y = 1.5; human.add(head);
+
+[[-0.1],[0.1]].forEach(([x]) => {
+  const e = new THREE.Mesh(new THREE.SphereGeometry(0.06,12,12),
+    new THREE.MeshStandardMaterial({color:0x111111}));
+  e.position.set(x, 1.6, 0.33); human.add(e);
+});
+
+function makeLimb(x,y,z) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(0.25,1.2,0.25), matLimb.clone());
+  m.position.set(x,y,z); human.add(m); return m;
+}
+
+const leftArm  = makeLimb(-0.8,  0.4, 0);
+const rightArm = makeLimb( 0.8,  0.4, 0);
+const leftLeg  = makeLimb(-0.3, -1.6, 0);
+const rightLeg = makeLimb( 0.3, -1.6, 0);
+
+const shadowPlane = new THREE.Mesh(
+  new THREE.CircleGeometry(1.2,32),
+  new THREE.MeshBasicMaterial({color:0x00ff88, transparent:true, opacity:0.04})
+);
+shadowPlane.rotation.x = -Math.PI/2;
+shadowPlane.position.y = -2.3;
+scene.add(shadowPlane);
+
+// =========================================================
+//  ANIMATION
+// =========================================================
+
+let pitch = 0, roll = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  pitch = Math.atan2(-imu.az, Math.hypot(imu.ax, imu.ay));   // forward / backward lean
+  roll  = Math.atan2(imu.ax, imu.ay);                        // left / right lean
+
+  human.rotation.x += (pitch - human.rotation.x) * 0.12;
+  human.rotation.z += ((MIRROR_LR ? roll : -roll) - human.rotation.z) * 0.12;
+
+  const t = Date.now() * 0.002;
+  leftArm.rotation.x  =  Math.sin(t)*0.1;
+  rightArm.rotation.x = -Math.sin(t)*0.1;
+  leftLeg.rotation.x  = -Math.sin(t)*0.08;
+  rightLeg.rotation.x =  Math.sin(t)*0.08;
+
+  const sway = Math.abs(imu.gx) + Math.abs(imu.gy);
+  human.position.x = Math.sin(Date.now()*0.005) * sway * 0.003;
+
+  const stability = 100 - Math.min(sway*1.5, 100);
+
+  // body colour = posture decision (green / blue / amber / red)
+  const bodyHex = decision.hex;
+  matBody.color.set(bodyHex);
+  shadowPlane.material.color.set(bodyHex);
+
+  updateStabilityUI(stability);
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// =========================================================
+//  LABEL COLOURS
+// =========================================================
+
+const LABEL_COLOR = {
+  forward_fall:   "#ff3333",
+  backward_fall:  "#ff6666",
+  left_fall:      "#6699ff",
+  right_fall:     "#ffcc00",
+  normal_walk:    "#88ccff",
+  standing_still: "#00ff88"
+};
+function colorFor(lbl) { return LABEL_COLOR[lbl] || "#c8d6e5"; }
+
+// =========================================================
+//  SERVER HEALTH CHECK
+// =========================================================
+
+async function checkServer() {
+  try {
+    const res = await fetch(`${SERVER_URL}/health`, { signal:AbortSignal.timeout(2000) });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    predClasses = data.classes || [];
+    serverOk = true;
+    setSrvStatus("ok", `Server OK · ${predClasses.length} classes`);
+    buildProbBars();
+    buildBufDots();
+  } catch {
+    serverOk = false;
+    setSrvStatus("err", "Server offline — run server.py");
+    setTimeout(checkServer, 4000);
+  }
+}
+
+function setSrvStatus(state, text) {
+  document.getElementById("srvDot").className  = "srv-dot " + state;
+  document.getElementById("srvText").textContent = text;
+}
+
+checkServer();
+
+// =========================================================
+//  BUILD PROB BARS & BUFFER DOTS
+// =========================================================
+
+function buildProbBars() {
+  document.getElementById("probBars").innerHTML =
+    predClasses.map(cls => `
+      <div class="prob-row">
+        <div class="prob-name">${cls.replace(/_/g," ")}</div>
+        <div class="prob-bar-wrap"><div class="prob-bar-fill" id="pb_${cls}" style="width:0%"></div></div>
+        <div class="prob-pct" id="pp_${cls}">0%</div>
+      </div>
+    `).join("");
+}
+
+function buildBufDots() {
+  document.getElementById("bufDots").innerHTML =
+    Array.from({length:WINDOW_SIZE}, (_,i) =>
+      `<div class="buf-dot" id="bd_${i}"></div>`
+    ).join("");
+}
+
+function updateBufDots() {
+  for (let i = 0; i < WINDOW_SIZE; i++) {
+    const el = document.getElementById(`bd_${i}`);
+    if (el) el.className = "buf-dot" + (i < sampleBuffer.length ? " filled" : "");
+  }
+}
+
+// =========================================================
+//  LIVE PREDICTION
+// =========================================================
+
+async function runPrediction() {
+  if (!serverOk || predInFlight || sampleBuffer.length < WINDOW_SIZE) return;
+  predInFlight = true;
+  try {
+    const res = await fetch(`${SERVER_URL}/predict`, {
+      method:  "POST",
+      headers: { "Content-Type":"application/json" },
+      body:    JSON.stringify({ window: sampleBuffer.slice(-WINDOW_SIZE) }),
+      signal:  AbortSignal.timeout(1500)
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    lastPrediction = data;
+    updatePredUI(data);
+    addToHistory(data);
+    evaluatePosture();
+  } catch(e) {
+    console.warn("Predict error:", e.message);
+  } finally {
+    predInFlight = false;
+  }
+}
+
+// =========================================================
+//  UPDATE PREDICTION UI
+// =========================================================
+
+function updatePredUI(data) {
+  const {
+    label,
+    confidence,
+    probabilities,
+    context,
+    human_message
+  } = data;
+  const col = colorFor(label);
+
+  // panel card
+  const lp = document.getElementById("predLabelPanel");
+  lp.textContent  = label.replace(/_/g," ");
+  lp.style.color  = col;
+  document.getElementById("predConfPanel").textContent = (confidence*100).toFixed(0)+"%";
+
+  // probability bars
+  for (const [cls, prob] of Object.entries(probabilities)) {
+    const bar = document.getElementById(`pb_${cls}`);
+    const pct = document.getElementById(`pp_${cls}`);
+    if (bar) { bar.style.width = (prob*100).toFixed(1)+"%"; bar.style.background = cls===label ? col : "var(--border)"; }
+    if (pct) pct.textContent = (prob*100).toFixed(0)+"%";
+  }
+
+  
+    // =========================================
+  // CONTEXT UI
+  // =========================================
+
+  if (context) {
+
+    document.getElementById("ctxActivity").textContent =
+      (context.previous_activity || "unknown")
+        .replace(/_/g," ");
+
+    document.getElementById("ctxStability").textContent =
+      context.stability || "unknown";
+
+    
+  }
+
+  // status bar
+  document.getElementById("recBarText").textContent =
+    `PRED: ${label.replace(/_/g," ").toUpperCase()} · ${(confidence*100).toFixed(0)}% · buf ${sampleBuffer.length}/${WINDOW_SIZE}`;
+}
+
+// =========================================================
+//  HISTORY
+// =========================================================
+
+function addToHistory(data) {
+  const time = new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  predHistory.unshift({ time, ...data });
+  if (predHistory.length > 20) predHistory.pop();
+
+  document.getElementById("histList").innerHTML = predHistory.map(h => {
+    const c = colorFor(h.label);
+    return `
+      <div class="hist-item">
+        <span class="hist-time">${h.time}</span>
+        <span class="hist-tag" style="background:${c}22;color:${c};">${h.label.replace(/_/g," ")}</span>
+        <span class="hist-conf">${(h.confidence*100).toFixed(0)}%</span>
+      </div>`;
+  }).join("");
+}
+
+// =========================================================
+//  MQTT
+// =========================================================
+
+
+function setStatus(state, text) {
+  document.getElementById("statusDot").className    = "dot " + state;
+  document.getElementById("statusText").textContent = text;
+}
+
+async function pollSensorData() {
+  try {
+    const response = await fetch('http://127.0.0.1:5050/latest');
+    const d = await response.json();
+
+    if (!d || typeof d.ax !== "number") {          // /latest is {} until the first MQTT message
+      setStatus("connecting", "Flask OK — waiting for device data…");
+      return;
+    }
+    imu = d;
+
+    setStatus("connected", "Receiving data from Flask");
+
+    sampleBuffer.push({
+      ax:d.ax, ay:d.ay, az:d.az,
+      gx:d.gx, gy:d.gy, gz:d.gz,
+      mag:d.mag
+    });
+
+    if (sampleBuffer.length > WINDOW_SIZE) sampleBuffer.shift();
+
+    updateBufDots();
+
+    samplesSincePred++;
+
+    if (sampleBuffer.length >= WINDOW_SIZE && samplesSincePred >= PRED_EVERY) {
+      samplesSincePred = 0;
+      runPrediction();
+    }
+
+    updateSensorUI();
+    evaluatePosture();
+
+  } catch (e) {
+    setStatus("error", "Flask server offline");
+    console.warn(e);
+  }
+}
+
+setInterval(pollSensorData, 100);
+pollSensorData();
+
+// =========================================================
+//  POSTURE DECISION ENGINE  (angle rules + AI model)
+// =========================================================
+//  LEVEL 0  UPRIGHT         tilt < 15°                      green
+//  LEVEL 1  SLIGHT TILT     15° .. 30°   normal movement    blue   (NOT a fall)
+//  LEVEL 2  LOSING BALANCE  30° .. 40°   early risk warning amber  (NOT a fall yet)
+//  LEVEL 3  FALL            tilt >= 40° held 0.2 s           red
+//                           OR AI says "fall" (>=60 %) while tilt >= 30°
+//  A fall stays latched until the person is upright again (<20° for 1 s).
+// =========================================================
+
+const RAD2DEG = 180 / Math.PI;
+const LEVELS  = [
+  { name:"UPRIGHT",        hex:"#00ff88" },
+  { name:"SLIGHT TILT",    hex:"#4db8ff" },
+  { name:"LOSING BALANCE", hex:"#ffaa00" },
+  { name:"FALL",           hex:"#ff3333" }
+];
+
+let overFallRun = 0, mlRun = 0, recoverRun = 0;
+let latched = false, fallSince = 0, latchedDir = "", latchedTilt = 0;
+let lastLevel = -1, eventLog = [];
+
+function readPosture() {
+  const n    = Math.hypot(imu.ax, imu.ay, imu.az) || 1;
+  const tilt = Math.acos(Math.max(-1, Math.min(1, imu.ay / n))) * RAD2DEG;  // angle from upright
+  const sx = imu.ax / n;   // +x = right
+  const sz = imu.az / n;   // +z = backward
+  let dir = "none";
+  if (Math.hypot(sx, sz) > 0.05) {
+    const side = sx > 0 ? "right" : "left";
+    const fb   = sz > 0 ? "backward" : "forward";
+    const a = Math.abs(sx), b = Math.abs(sz);
+    dir = (Math.min(a, b) / Math.max(a, b) > 0.6) ? fb + "-" + side : (a > b ? side : fb);
+  }
+  return { tilt, dir };
+}
+
+function evaluatePosture() {
+  const L = LOGIC, p = readPosture(), now = Date.now();
+
+  overFallRun = p.tilt >= L.fallTilt ? overFallRun + 1 : 0;
+  recoverRun  = p.tilt <  L.recoverTilt ? recoverRun + 1 : 0;
+
+  const mlFall = lastPrediction && lastPrediction.label.includes("fall") &&
+                 lastPrediction.confidence >= L.mlMinConf;
+  mlRun = (mlFall && p.tilt >= L.safeTilt) ? mlRun + 1 : 0;
+
+  const fallByAngle = overFallRun >= L.dwell;
+  const fallByML    = mlRun >= L.dwell;
+
+  if (fallByAngle || fallByML) {
+    if (!latched) { latched = true; fallSince = now; latchedDir = p.dir; latchedTilt = p.tilt; }
+    else if (p.tilt > latchedTilt) { latchedDir = p.dir; latchedTilt = p.tilt; }
+  }
+  if (latched && !fallByAngle && !fallByML &&
+      recoverRun >= L.recoverSamples && now - fallSince >= L.holdMs) latched = false;
+
+  const t   = p.tilt.toFixed(0);
+  const act = lastPrediction && lastPrediction.context
+              ? (lastPrediction.context.previous_activity || "").replace(/_/g, " ") : "";
+  const actTxt = act ? ` while ${act}` : "";
+
+  let level, title, why;
+  if (latched) {
+    level = 3;
+    const d = latchedDir === "none" ? "" : latchedDir;
+    title = "FALL" + (d ? " · " + d.toUpperCase() : "");
+    if (fallByAngle)   why = `User fell ${d}${actTxt}. Body tilted ${t}° — past the ${L.fallTilt}° fall angle.`;
+    else if (fallByML) why = `User fell ${d}${actTxt}. AI model detected "${lastPrediction.label.replace(/_/g," ")}" (${(lastPrediction.confidence*100).toFixed(0)}%) and tilt is ${t}° (over the ${L.safeTilt}° safe limit).`;
+    else               why = `Fall alert held — user fell ${d}${actTxt} and has not returned upright yet (now ${t}°).`;
+  } else if (p.tilt >= L.safeTilt) {
+    level = 2;
+    title = "LOSING BALANCE" + (p.dir !== "none" ? " · " + p.dir.toUpperCase() : "");
+    why = `Leaning ${p.dir} by ${t}°. Beyond the safe limit (${L.safeTilt}°) but below the fall angle (${L.fallTilt}°) — early fall-risk warning, not a fall.`;
+  } else if (p.tilt >= L.slightTilt) {
+    level = 1;
+    title = (p.dir !== "none" ? p.dir.toUpperCase() + " " : "") + "TILT";
+    why = `Leaning slightly ${p.dir} (${t}°). Within the normal range — not a fall.`;
+  } else {
+    level = 0; title = "UPRIGHT";
+    why = "Upright and stable.";
+  }
+
+  const lv = LEVELS[level];
+  decision = { level, hex: lv.hex };
+
+  // ---- UI ----
+  const set = (id, txt) => { document.getElementById(id).textContent = txt; };
+  const pl = document.getElementById("postLevel");
+  pl.textContent = title; pl.style.color = lv.hex;
+  set("postAngle", t + "°");
+  const gf = document.getElementById("gFill");
+  gf.style.width = Math.min(p.tilt / 90 * 100, 100) + "%"; gf.style.background = lv.hex;
+  set("postWhy", why);
+  set("ctxDirection", p.dir === "none" ? "upright" : (level === 3 && latchedDir ? latchedDir : p.dir));
+  set("ctxMessage", why);
+
+  const ol = document.getElementById("predLabel");
+  ol.textContent = title; ol.style.color = lv.hex; ol.style.textShadow = `0 0 20px ${lv.hex}`;
+  set("predConf", `${t}° from upright`);
+
+  const note = (lastPrediction && lastPrediction.label.includes("fall") && level < 3)
+    ? `AI says "${lastPrediction.label.replace(/_/g," ")}" but tilt (${t}°) is below the ${L.safeTilt}° gate → not counted as a fall.` : "";
+  set("postNote", note);
+
+  document.getElementById("fallAlert").classList.toggle("active", level === 3);
+
+  if (level !== lastLevel) {
+    if (lastLevel !== -1 || level > 0) logEvent(title, lv.hex, t);
+    lastLevel = level;
+  }
+}
+
+function logEvent(title, hex, angle) {
+  const time = new Date().toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  eventLog.unshift({ time, title, hex, angle });
+  if (eventLog.length > 20) eventLog.pop();
+  document.getElementById("alertList").innerHTML = eventLog.map(e => `
+    <div class="hist-item">
+      <span class="hist-time">${e.time}</span>
+      <span class="hist-tag" style="background:${e.hex}22;color:${e.hex};">${e.title}</span>
+      <span class="hist-conf">${e.angle}°</span>
+    </div>`).join("");
+}
+
+// ---- settings sliders ----
+function syncSettings() {
+  document.getElementById("safeVal").textContent = LOGIC.safeTilt + "°";
+  document.getElementById("fallVal").textContent = LOGIC.fallTilt + "°";
+  const m = (id, tid, deg) => {
+    document.getElementById(id).style.left = Math.min(deg / 90 * 100, 100) + "%";
+    document.getElementById(tid).textContent = deg + "°";
+  };
+  m("gSafe", "gSafeT", LOGIC.safeTilt);
+  m("gFall", "gFallT", LOGIC.fallTilt);
+}
+document.getElementById("safeRange").addEventListener("input", e => {
+  LOGIC.safeTilt = +e.target.value;
+  if (LOGIC.fallTilt < LOGIC.safeTilt + 5) {
+    LOGIC.fallTilt = LOGIC.safeTilt + 5;
+    document.getElementById("fallRange").value = LOGIC.fallTilt;
+  }
+  syncSettings();
+});
+document.getElementById("fallRange").addEventListener("input", e => {
+  LOGIC.fallTilt = Math.max(+e.target.value, LOGIC.safeTilt + 5);
+  e.target.value = LOGIC.fallTilt;
+  syncSettings();
+});
+document.getElementById("resetBtn").addEventListener("click", () => {
+  latched = false; overFallRun = mlRun = recoverRun = 0; evaluatePosture();
+});
+syncSettings();
+
+// =========================================================
+//  SENSOR & STABILITY UI
+// =========================================================
+
+function updateStabilityUI(stability) {
+  document.getElementById("stability").textContent = stability.toFixed(0)+"%";
+  const sf = document.getElementById("stabFill");
+  sf.style.width      = stability+"%";
+  sf.style.background = stability>70 ? "var(--green)" : stability>40 ? "var(--yellow)" : "var(--red)";
+  document.getElementById("hudPitch").textContent = (pitch*180/Math.PI).toFixed(1);
+  document.getElementById("hudRoll").textContent  = (roll *180/Math.PI).toFixed(1);
+  document.getElementById("hudMag").textContent   = imu.mag.toFixed(2);
+}
+
+function updateSensorUI() {
+  ["ax","ay","az","gx","gy","gz"].forEach(k => {
+    document.getElementById(k).textContent = imu[k].toFixed(2);
+  });
+  document.getElementById("mag").textContent   = imu.mag.toFixed(2);
+  document.getElementById("pitch").textContent = (pitch*180/Math.PI).toFixed(1)+"°";
+  document.getElementById("roll").textContent  = (roll *180/Math.PI).toFixed(1)+"°";
+  document.getElementById("magFill").style.width = Math.min(imu.mag*8,100)+"%";
+}
+
+// =========================================================
+//  RESIZE
+// =========================================================
+
+window.addEventListener("resize", () => {
+  const w = window.innerWidth-380, h = window.innerHeight;
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+});
+
+</script>
+</body>
+</html>

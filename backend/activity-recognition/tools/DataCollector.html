@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elder Movement Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:       #080c10;
+  --panel:    #0d1117;
+  --card:     #111820;
+  --border:   #1e2a38;
+  --green:    #00ff88;
+  --yellow:   #ffcc00;
+  --red:      #ff3333;
+  --blue:     #1a6aff;
+  --text:     #c8d6e5;
+  --muted:    #556070;
+  --mono:     'Share Tech Mono', monospace;
+  --sans:     'Rajdhani', sans-serif;
+}
+
+body {
+  overflow: hidden;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ── VIEWER ── */
+#viewer {
+  flex: 1;
+  position: relative;
+}
+
+#viewer canvas { display: block; }
+
+/* corner HUD */
+#hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  line-height: 1.8;
+  pointer-events: none;
+  text-shadow: 0 0 8px var(--green);
+}
+
+#recBadge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  display: none;
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ── PANEL ── */
+#panel {
+  width: 380px;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#panelScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* title */
+.panel-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.panel-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+
+/* card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* status dot */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.dot.connected   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot.error       { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+.dot.connecting  { background: var(--yellow); animation: pulse 1.2s ease-in-out infinite; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+#statusText {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* big metric */
+.metric-big {
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: normal;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* bar */
+.bar {
+  width: 100%;
+  height: 6px;
+  background: #0a0f14;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 4px;
+  transition: width 0.12s ease, background 0.3s;
+}
+
+.metric-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* sensor grid */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.sensor-item {
+  background: #0a0f14;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.sensor-key {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.sensor-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+/* orientation row */
+.orient-row {
+  display: flex;
+  gap: 10px;
+}
+
+.orient-box {
+  flex: 1;
+  background: #0a0f14;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+
+.orient-key {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.orient-val {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: #fff;
+  margin-top: 4px;
+}
+
+/* ── DATA COLLECTION ── */
+.collect-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.fall-select {
+  width: 100%;
+  padding: 9px 12px;
+  background: #0a0f14;
+  color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-family: var(--mono);
+  font-size: 12px;
+  margin-bottom: 10px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23556070'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.fall-select:focus { border-color: var(--green); }
+
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn {
+  padding: 10px;
+  border: none;
+  border-radius: 7px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-rec  { background: var(--green); color: #000; }
+.btn-stop { background: var(--red);   color: #fff; }
+.btn-exp  { background: var(--blue);  color: #fff; width: 100%; }
+.btn-clr  { background: #1a2330;      color: var(--muted); border: 1px solid var(--border); width: 100%; margin-top: 6px; }
+
+/* session list */
+.session-list {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0a0f14;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+}
+
+.session-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tag-forward  { background:#1a2a1a; color:#00ff88; }
+.tag-backward { background:#2a1a1a; color:#ff6666; }
+.tag-left     { background:#1a1a2a; color:#6699ff; }
+.tag-right    { background:#2a2a1a; color:#ffcc00; }
+.tag-walk     { background:#1a2028; color:#88ccff; }
+.tag-still    { background:#1e1e1e; color:#888888; }
+.tag-default  { background:#1a1a1a; color:#aaaaaa; }
+
+.session-info {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.session-del {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.session-del:hover { color: var(--red); }
+
+/* rec status bar at bottom */
+#recBar {
+  padding: 10px 20px;
+  background: #0a0f14;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#recDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+#recDot.active {
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red);
+  animation: pulse 0.8s ease-in-out infinite;
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- 3D VIEWER -->
+  <div id="viewer">
+    <div id="hud">
+      <div>PITCH &nbsp;<span id="hudPitch">0.0</span>°</div>
+      <div>ROLL &nbsp;&nbsp;<span id="hudRoll">0.0</span>°</div>
+      <div>MAG &nbsp;&nbsp;&nbsp;<span id="hudMag">0.00</span></div>
+    </div>
+    <div id="recBadge">● REC</div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div id="panel">
+    <div id="panelScroll">
+
+      <div class="panel-title">Elder Prevention AI</div>
+      <div class="panel-sub">IMU FALL DETECTION SYSTEM</div>
+
+      <!-- MQTT STATUS -->
+      <div class="card">
+        <div class="card-label">MQTT STATUS</div>
+        <div class="status-row">
+          <div class="dot connecting" id="statusDot"></div>
+          <div id="statusText">connecting...</div>
+        </div>
+      </div>
+
+      <!-- MOVEMENT MAGNITUDE -->
+      <div class="card">
+        <div class="card-label">MOVEMENT MAGNITUDE</div>
+        <div class="metric-big" id="mag">0.00</div>
+        <div class="bar">
+          <div class="fill" id="magFill" style="background:var(--green);"></div>
+        </div>
+      </div>
+
+      <!-- STABILITY SCORE -->
+      <div class="card">
+        <div class="card-label">STABILITY SCORE</div>
+        <div class="metric-big" id="stability">100%</div>
+        <div class="bar">
+          <div class="fill" id="stabFill" style="background:var(--green); width:100%;"></div>
+        </div>
+        <div class="metric-note">Lower = unstable movement</div>
+      </div>
+
+      <!-- ORIENTATION -->
+      <div class="card">
+        <div class="card-label">BODY ORIENTATION</div>
+        <div class="orient-row">
+          <div class="orient-box">
+            <div class="orient-key">PITCH</div>
+            <div class="orient-val" id="pitch">0.0°</div>
+          </div>
+          <div class="orient-box">
+            <div class="orient-key">ROLL</div>
+            <div class="orient-val" id="roll">0.0°</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SENSOR RAW DATA -->
+      <div class="card">
+        <div class="card-label">SENSOR DATA</div>
+        <div class="sensor-grid">
+          <div class="sensor-item">
+            <div class="sensor-key">AX</div>
+            <div class="sensor-val" id="ax">0.00</div>
+          </div>
+          <div class="sensor-item">
+            <div class="sensor-key">AY</div>
+            <div class="sensor-val" id="ay">0.00</div>
+          </div>
+          <div class="sensor-item">
+            <div class="sensor-key">AZ</div>
+            <div class="sensor-val" id="az">0.00</div>
+          </div>
+          <div class="sensor-item">
+            <div class="sensor-key">GX</div>
+            <div class="sensor-val" id="gx">0.00</div>
+          </div>
+          <div class="sensor-item">
+            <div class="sensor-key">GY</div>
+            <div class="sensor-val" id="gy">0.00</div>
+          </div>
+          <div class="sensor-item">
+            <div class="sensor-key">GZ</div>
+            <div class="sensor-val" id="gz">0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA COLLECTION -->
+      <div class="card">
+        <div class="collect-label">DATA COLLECTION</div>
+
+        <!-- SUBJECT ID: lets you record the SAME wearable on many
+             different volunteers and combine every CSV later into one
+             multi-person dataset, with no extra hardware needed
+             (fixes issue #2 - person-independent activity recognition). -->
+        <div class="card-label" style="margin-bottom:6px;">SUBJECT ID</div>
+        <input class="fall-select" id="subjectId" type="text"
+               placeholder="e.g. S01, S02..." value="S01"
+               style="margin-bottom:10px;" />
+
+        <select class="fall-select" id="fallLabel">
+          <optgroup label="Falls">
+            <option value="forward_fall">⬆ Forward Fall</option>
+            <option value="backward_fall">⬇ Backward Fall</option>
+            <option value="left_fall">⬅ Left Fall</option>
+            <option value="right_fall">➡ Right Fall</option>
+          </optgroup>
+          <optgroup label="Near-fall (recovered) — critical negative class">
+            <option value="near_fall_recovered">〰 Stumble / Lean, Recovered</option>
+          </optgroup>
+          <optgroup label="Activities of Daily Living (ADLs)">
+            <option value="normal_walk">🚶 Normal Walk</option>
+            <option value="standing_still">🧍 Standing Still</option>
+            <option value="sitting_down">⬇🪑 Sitting Down</option>
+            <option value="sitting_still">🪑 Sitting Still</option>
+            <option value="standing_up">⬆🪑 Standing Up (from chair)</option>
+            <option value="lying_down">🛏 Lying Down</option>
+            <option value="climbing_stairs">🪜 Climbing Stairs</option>
+          </optgroup>
+        </select>
+
+        <div class="btn-row">
+          <button class="btn btn-rec" id="btnRec" onclick="startRecording()">● REC</button>
+          <button class="btn btn-stop" id="btnStop" onclick="stopRecording()" disabled>■ STOP</button>
+        </div>
+
+        <button class="btn btn-exp" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-clr" onclick="clearSessions()">✕ Clear All Sessions</button>
+
+        <!-- SESSION LIST -->
+        <div style="margin-top:14px;">
+          <div class="card-label" id="sessionCountLabel">SESSIONS SAVED — 0</div>
+          <div class="session-list" id="sessionList">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;padding:16px 0;">
+              No sessions yet. Hit REC to start.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panelScroll -->
+
+    <!-- REC STATUS BAR -->
+    <div id="recBar">
+      <div id="recDot"></div>
+      <span id="recBarText">IDLE — SELECT A LABEL AND HIT REC</span>
+    </div>
+
+  </div><!-- /panel -->
+
+</div><!-- /app -->
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script>
+
+// =========================================================
+// MQTT CONFIG (HiveMQ Cloud)
+// =========================================================
+
+const MQTT_HOST  = "wss://48d92cd1b9814701b2c4559d693e4ce3.s1.eu.hivemq.cloud:8884/mqtt";
+const MQTT_USER  = "elder";
+const MQTT_PASS  = "Elder123456";
+const MQTT_TOPIC = "elder/device01/imu";
+
+// =========================================================
+//  AXIS CONFIG
+// =========================================================
+
+const AXIS = {
+  x: "az",
+  y: "ax",
+  z: "ay",
+  invertX: true,
+  invertY: false,
+  invertZ: false
+};
+
+// =========================================================
+//  SENSOR STATE
+// =========================================================
+
+let imu = { ax:0, ay:0, az:9.81, gx:0, gy:0, gz:0, mag:9.81 };
+
+function getAxis(name) {
+  let v = imu[name];
+  if (name === AXIS.x && AXIS.invertX) v *= -1;
+  if (name === AXIS.y && AXIS.invertY) v *= -1;
+  if (name === AXIS.z && AXIS.invertZ) v *= -1;
+  return v;
+}
+
+// =========================================================
+//  THREE.JS SCENE
+// =========================================================
+
+const scene    = new THREE.Scene();
+scene.background = new THREE.Color(0x080c10);
+scene.fog        = new THREE.FogExp2(0x080c10, 0.06);
+
+const camera = new THREE.PerspectiveCamera(
+  55,
+  (window.innerWidth - 380) / window.innerHeight,
+  0.1, 1000
+);
+camera.position.set(0, 2.5, 7);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth - 380, window.innerHeight);
+document.getElementById("viewer").appendChild(renderer.domElement);
+
+// lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+const dir = new THREE.DirectionalLight(0xffffff, 1);
+dir.position.set(5, 10, 5);
+scene.add(dir);
+const fill = new THREE.DirectionalLight(0x8888ff, 0.3);
+fill.position.set(-5, 2, -5);
+scene.add(fill);
+
+// grid
+const grid = new THREE.GridHelper(30, 30, 0x1e2a38, 0x111820);
+scene.add(grid);
+
+// human group
+const human = new THREE.Group();
+scene.add(human);
+
+const matBody  = new THREE.MeshStandardMaterial({ color:0x00ff88, roughness:0.4, metalness:0.1 });
+const matHead  = new THREE.MeshStandardMaterial({ color:0xffcc99, roughness:0.6 });
+const matLimb  = new THREE.MeshStandardMaterial({ color:0x334455, roughness:0.5 });
+
+// body
+const body = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 0.5), matBody);
+human.add(body);
+
+// head
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), matHead);
+head.position.y = 1.5;
+human.add(head);
+
+// eyes
+function eye(x) {
+  const e = new THREE.Mesh(
+    new THREE.SphereGeometry(0.06, 12, 12),
+    new THREE.MeshStandardMaterial({ color:0x111111 })
+  );
+  e.position.set(x, 1.6, 0.33);
+  human.add(e);
+}
+eye(-0.1); eye(0.1);
+
+// limb factory
+function makeLimb(x, y, z, h) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(0.25, h || 1.2, 0.25), matLimb.clone());
+  m.position.set(x, y, z);
+  human.add(m);
+  return m;
+}
+
+const leftArm  = makeLimb(-0.8,  0.4, 0);
+const rightArm = makeLimb( 0.8,  0.4, 0);
+const leftLeg  = makeLimb(-0.3, -1.6, 0);
+const rightLeg = makeLimb( 0.3, -1.6, 0);
+
+// shadow plane
+const shadowPlane = new THREE.Mesh(
+  new THREE.CircleGeometry(1.2, 32),
+  new THREE.MeshBasicMaterial({ color:0x00ff88, transparent:true, opacity:0.04 })
+);
+shadowPlane.rotation.x = -Math.PI / 2;
+shadowPlane.position.y = -2.3;
+scene.add(shadowPlane);
+
+// =========================================================
+//  ANIMATION LOOP
+// =========================================================
+
+let pitch = 0;
+let roll  = 0;
+let stableColor = new THREE.Color(0x00ff88);
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const x = getAxis(AXIS.x);
+  const y = getAxis(AXIS.y);
+  const z = getAxis(AXIS.z);
+
+  pitch = Math.atan2(x, Math.sqrt(y*y + z*z));
+  roll  = Math.atan2(y, z);
+
+  human.rotation.x += (pitch - human.rotation.x)  * 0.08;
+  human.rotation.z += (-roll - human.rotation.z)   * 0.08;
+
+  // subtle arm/leg sway
+  const t = Date.now() * 0.002;
+  leftArm.rotation.x  =  Math.sin(t) * 0.1;
+  rightArm.rotation.x = -Math.sin(t) * 0.1;
+  leftLeg.rotation.x  = -Math.sin(t) * 0.08;
+  rightLeg.rotation.x =  Math.sin(t) * 0.08;
+
+  // gyro sway
+  let sway = Math.abs(imu.gx) + Math.abs(imu.gy);
+  human.position.x = Math.sin(Date.now() * 0.005) * sway * 0.003;
+
+  // stability
+  let risk      = Math.min(sway * 1.5, 100);
+  let stability = 100 - risk;
+
+  // body color
+  if (stability > 70) {
+    matBody.color.set(0x00ff88);
+  } else if (stability > 40) {
+    matBody.color.set(0xffcc00);
+  } else {
+    matBody.color.set(0xff3333);
+  }
+
+  // shadow tint
+  shadowPlane.material.color.copy(matBody.color);
+
+  // UI
+  updateStabilityUI(stability);
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// =========================================================
+//  UI — STABILITY
+// =========================================================
+
+function updateStabilityUI(stability) {
+  const stabEl = document.getElementById("stability");
+  const stabFill = document.getElementById("stabFill");
+  stabEl.textContent = stability.toFixed(0) + "%";
+  stabFill.style.width = stability + "%";
+
+  if (stability > 70) {
+    stabFill.style.background = "var(--green)";
+  } else if (stability > 40) {
+    stabFill.style.background = "var(--yellow)";
+  } else {
+    stabFill.style.background = "var(--red)";
+  }
+
+  document.getElementById("hudPitch").textContent = (pitch * 180 / Math.PI).toFixed(1);
+  document.getElementById("hudRoll").textContent  = (roll  * 180 / Math.PI).toFixed(1);
+  document.getElementById("hudMag").textContent   = imu.mag.toFixed(2);
+}
+
+// =========================================================
+//  UI — SENSOR READOUT
+// =========================================================
+
+function updateSensorUI() {
+  document.getElementById("ax").textContent = imu.ax.toFixed(2);
+  document.getElementById("ay").textContent = imu.ay.toFixed(2);
+  document.getElementById("az").textContent = imu.az.toFixed(2);
+  document.getElementById("gx").textContent = imu.gx.toFixed(2);
+  document.getElementById("gy").textContent = imu.gy.toFixed(2);
+  document.getElementById("gz").textContent = imu.gz.toFixed(2);
+  document.getElementById("mag").textContent = imu.mag.toFixed(2);
+
+  document.getElementById("pitch").textContent = (pitch * 180 / Math.PI).toFixed(1) + "°";
+  document.getElementById("roll").textContent  = (roll  * 180 / Math.PI).toFixed(1) + "°";
+
+  const magPct = Math.min(imu.mag * 8, 100);
+  document.getElementById("magFill").style.width = magPct + "%";
+}
+
+// =========================================================
+//  MQTT
+// =========================================================
+
+const client = mqtt.connect(MQTT_HOST, {
+  username: MQTT_USER,
+  password: MQTT_PASS,
+  clean: true,
+  reconnectPeriod: 2000,
+  connectTimeout: 4000,
+});
+
+function setStatus(state, text) {
+  const dot  = document.getElementById("statusDot");
+  const span = document.getElementById("statusText");
+  dot.className  = "dot " + state;
+  span.textContent = text;
+}
+
+client.on("connect", () => {
+  setStatus("connected", "Connected to broker");
+  client.subscribe(MQTT_TOPIC);
+});
+
+client.on("message", (topic, message) => {
+  try {
+    const d = JSON.parse(message.toString());
+    imu = d;
+    if (isRecording) {
+      currentBuffer.push({
+        t:  Date.now(),
+        ax: d.ax, ay: d.ay, az: d.az,
+        gx: d.gx, gy: d.gy, gz: d.gz,
+        mag: d.mag
+      });
+    }
+    updateSensorUI();
+  } catch(e) {
+    console.warn("Parse error:", e);
+  }
+});
+
+client.on("error", () => setStatus("error", "Connection failed"));
+client.on("reconnect", () => setStatus("connecting", "Reconnecting..."));
+client.on("offline", () => setStatus("error", "Offline"));
+
+// =========================================================
+//  DATA LOGGER
+// =========================================================
+
+let isRecording       = false;
+let currentLabel      = null;
+let currentSubject    = localStorage.getItem("fallcollector_subject") || "S01";
+let currentBuffer     = [];
+let recordedSessions  = [];
+let recStartTime      = 0;
+let recTimer          = null;
+
+// Restore the last-used subject id into the input on page load so a
+// multi-session recording run for the same volunteer stays consistent.
+window.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("subjectId");
+  if (el) el.value = currentSubject;
+});
+
+function startRecording() {
+  currentLabel   = document.getElementById("fallLabel").value;
+  currentSubject = document.getElementById("subjectId").value.trim() || "S01";
+  localStorage.setItem("fallcollector_subject", currentSubject);
+  currentBuffer = [];
+  isRecording   = true;
+  recStartTime  = Date.now();
+
+  document.getElementById("btnRec").disabled  = true;
+  document.getElementById("btnStop").disabled = false;
+  document.getElementById("recBadge").style.display = "block";
+  document.getElementById("recDot").classList.add("active");
+
+  let elapsed = 0;
+  recTimer = setInterval(() => {
+    elapsed = ((Date.now() - recStartTime) / 1000).toFixed(1);
+    document.getElementById("recBarText").textContent =
+      `RECORDING: ${currentLabel.toUpperCase()} — ${elapsed}s — ${currentBuffer.length} samples`;
+  }, 100);
+}
+
+function stopRecording() {
+  if (!isRecording) return;
+  isRecording = false;
+  clearInterval(recTimer);
+
+  const session = {
+    id:        Date.now(),
+    label:     currentLabel,
+    subject:   currentSubject,
+    timestamp: new Date().toISOString(),
+    duration:  ((Date.now() - recStartTime) / 1000).toFixed(1),
+    samples:   currentBuffer
+  };
+
+  recordedSessions.push(session);
+
+  document.getElementById("btnRec").disabled  = false;
+  document.getElementById("btnStop").disabled = true;
+  document.getElementById("recBadge").style.display = "none";
+  document.getElementById("recDot").classList.remove("active");
+  document.getElementById("recBarText").textContent =
+    `IDLE — ${recordedSessions.length} SESSION(S) SAVED`;
+
+  renderSessionList();
+  currentBuffer = [];
+}
+
+function deleteSession(id) {
+  recordedSessions = recordedSessions.filter(s => s.id !== id);
+  renderSessionList();
+  document.getElementById("recBarText").textContent =
+    `IDLE — ${recordedSessions.length} SESSION(S) SAVED`;
+}
+
+function clearSessions() {
+  if (recordedSessions.length === 0) return;
+  if (!confirm(`Delete all ${recordedSessions.length} sessions?`)) return;
+  recordedSessions = [];
+  renderSessionList();
+  document.getElementById("recBarText").textContent = "IDLE — SELECT A LABEL AND HIT REC";
+}
+
+function tagClass(label) {
+  if (label.includes("forward"))  return "tag-forward";
+  if (label.includes("backward")) return "tag-backward";
+  if (label.includes("left"))     return "tag-left";
+  if (label.includes("right"))    return "tag-right";
+  if (label.includes("walk"))     return "tag-walk";
+  if (label.includes("still"))    return "tag-still";
+  return "tag-default";
+}
+
+function renderSessionList() {
+  const list = document.getElementById("sessionList");
+  document.getElementById("sessionCountLabel").textContent =
+    `SESSIONS SAVED — ${recordedSessions.length}`;
+
+  if (recordedSessions.length === 0) {
+    list.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;padding:16px 0;">No sessions yet. Hit REC to start.</div>`;
+    return;
+  }
+
+  list.innerHTML = recordedSessions.map(s => `
+    <div class="session-item">
+      <span class="session-tag ${tagClass(s.label)}">${s.label.replace(/_/g," ")}</span>
+      <span class="session-info">${s.subject || "S01"} · ${s.samples.length}smp / ${s.duration}s</span>
+      <button class="session-del" onclick="deleteSession(${s.id})" title="Delete">✕</button>
+    </div>
+  `).join("");
+}
+
+// =========================================================
+//  EXPORT CSV
+// =========================================================
+
+function exportCSV() {
+  if (recordedSessions.length === 0) {
+    alert("No sessions recorded yet!");
+    return;
+  }
+
+  // NOTE: "subject_id" column added so several volunteers' recordings
+  // (each still using the SAME single wearable device) can be merged
+  // into one multi-person dataset for person-independent training -
+  // see train.py --loso and README_GUIDE.md section 5.
+  const rows = ["label,subject_id,session_id,sample_index,timestamp_ms,ax,ay,az,gx,gy,gz,mag"];
+
+  recordedSessions.forEach((session, si) => {
+    session.samples.forEach((s, idx) => {
+      rows.push([
+        session.label,
+        session.subject || "S01",
+        si + 1,
+        idx,
+        s.t,
+        s.ax.toFixed(4),
+        s.ay.toFixed(4),
+        s.az.toFixed(4),
+        s.gx.toFixed(4),
+        s.gy.toFixed(4),
+        s.gz.toFixed(4),
+        s.mag.toFixed(4)
+      ].join(","));
+    });
+  });
+
+  const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `fall_data_${currentSubject}_${new Date().toISOString().slice(0,19).replace(/:/g,"-")}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// =========================================================
+//  RESIZE
+// =========================================================
+
+window.addEventListener("resize", () => {
+  const w = window.innerWidth - 380;
+  const h = window.innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+});
+
+</script>
+</body>
+</html>
