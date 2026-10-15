@@ -17,7 +17,7 @@ const MODULES = [
     icon: MapPin,
     title: "Environmental Risk Mapping",
     description: "Smart safety zones that detect high-risk  areas in the care facility.",
-    owner: "Sashini Diwyangii",
+    owner: "Sashini Diwyangi",
     status: "live",
     streamLabel: "Zone sensors · MQTT",
     rate: "Realtime",
