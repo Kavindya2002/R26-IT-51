@@ -107,7 +107,7 @@ export default function Cardiovascular() {
       }
     };
 
- 
+
     ws.onclose = () => { setIsServerConnected(false); setIsEsp32Active(false); };
     ws.onerror = () => { setIsServerConnected(false); setIsEsp32Active(false); };
 
@@ -316,58 +316,123 @@ export default function Cardiovascular() {
       {/* Main Workspace */}
       <div style={{ flex: 1, padding: '20px 30px', overflowY: 'auto' }}>
 
-        <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '14px', fontSize: '15px', fontWeight: 600, color: '#0369a1', textDecoration: 'none' }}>
-          <ArrowLeft size={18} /> Back to dashboard
-        </Link>
+        <div style={{
+          backgroundColor: '#346086',
+          backgroundImage: `
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+  `,
+          backgroundSize: '30px 30px', // Adjust this value to change grid square size
+          padding: '24px 32px',
+          color: '#ffffff',
+          fontFamily: 'sans-serif'
+        }}>
+          {/* Back/End Session Link */}
+          <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: '#ffff', textDecoration: 'none', paddingLeft: '100px' }}>
+            <ArrowLeft size={18} /> Back to Dashbord
+          </Link>
 
-        {/* Top Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#0369a1' }}>Module 03 · Owner: Hirushi Divyanjalie</p>
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Heart Rate & Blood Pressure Monitoring Dashboard</h2>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
-              <Server size={14} color={isServerConnected ? '#22c55e' : '#ef4444'} />
-              <span style={{ fontWeight: 500 }}>Backend: {isServerConnected ? 'Online' : 'Offline'}</span>
-            </span>
-            {/* Header Right Side Status Badge */}
-            <span style={{
-              backgroundColor: '#e2e8f0',
-              padding: '6px 12px',
-              borderRadius: '15px',
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              border: '1px solid #cbd5e1'
-            }}>
-              {isEsp32Active ? (
-                <>
-                  <Wifi size={14} color="#22c55e" />
-                  <span style={{ fontWeight: 500 }}>ESP32: Active</span>
-                  
-                </>
-              ) : (
-                <>
-                  <WifiOff size={14} color="#ef4444" />
-                  <span>ESP32: Disconnected</span>
-                </>
-              )}
-            </span>
-            <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
 
-              <p style={{ margin: 0, fontSize: '12px', color: '#1a212c' }}>
-                Patient Status:
-                <span style={{
-                  color: (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical' || (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical Warning' ? '#ef4444' : '#22c55e',
-                  fontWeight: 'bold'
-                }}>
-                  {isEsp32Active ? realtimeData.db_avg_status : summaryStats.status}
-                </span>
-              </p>
-            </span>
+          {/* Top Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px', paddingLeft: '100px' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#e2e6e7' }}>Module 03 · Owner: Hirushi Divyanjalie</p>
+              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Heart Rate & Blood Pressure Monitoring Dashboard</h2>
+            </div>
+
+
+
+
+
+
+
+            <>
+              <style>
+                {`
+      @keyframes ekgScan {
+        0% { stroke-dashoffset: 700; }
+        100% { stroke-dashoffset: 0; }
+      }
+      .ekg-animated-path {
+        stroke-dasharray: 700;
+        animation: ekgScan 2.5s linear infinite;
+      }
+    `}
+              </style>
+              <div style={{ flex: 1, height: '70px', overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative' }}>
+                <svg width="100%" height="65" viewBox="0 0 600 65" preserveAspectRatio="none">
+                  {/* Background Glowing Heart */}
+                  <path
+                    d="M300,52 C275,38 220,24 220,12 C220,4 230,0 242,0 C256,0 275,10 300,28 C325,10 344,0 358,0 C370,0 380,4 380,12 C380,24 325,38 300,52 Z"
+                    fill="none"
+                    stroke="#38bdf8"
+                    strokeWidth="2"
+                    strokeOpacity="0.5"
+                    filter="drop-shadow(0px 0px 6px rgba(56, 189, 248, 0.6))"
+                  />
+                  {/* Animated EKG Line passing through the heart */}
+                  <path
+                    className="ekg-animated-path"
+                    d="M0,32 L200,32 L215,18 L230,48 L245,10 L260,52 L275,32 L325,32 L340,18 L355,48 L370,10 L385,52 L400,32 L600,32"
+                    fill="none"
+                    stroke="#38bdf8"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="drop-shadow(0px 0px 8px rgba(56, 189, 248, 0.9))"
+                  />
+                </svg>
+              </div>
+            </>
+
+
+
+
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
+                <Server size={18} color={isServerConnected ? '#22c55e' : '#ef4444'} />
+                <span style={{ fontWeight: 700, color: '#0f0f0f', fontSize: '17px' }}>Backend: {isServerConnected ? 'Online' : 'Offline'}</span>
+              </span>
+              {/* Header Right Side Status Badge */}
+              <span style={{
+                backgroundColor: '#f7f7f7',
+                padding: '6px 12px',
+                borderRadius: '15px',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                border: '1px solid #0d0d0e'
+              }}>
+                {isEsp32Active ? (
+                  <>
+                    <Wifi size={14} color="#22c55e" />
+                    <span style={{ fontWeight: 700, color: '#ef4444', fontSize: '17px' }}>ESP32: Active</span>
+
+                  </>
+                ) : (
+                  <>
+                    <WifiOff size={18} color="#ef4444" />
+                    <span style={{ fontWeight: 700, color: '#0f0f0f', fontSize: '17px' }}>ESP32: Disconnected</span>
+                  </>
+                )}
+              </span>
+              <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
+
+                <p style={{ margin: 0, fontSize: '17px', color: '#0f0f0f', fontWeight: 700 }}>
+                  Patient Status:
+                  <span style={{
+                    color: (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical' || (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical Warning' ? '#ef4444' : '#22c55e',
+                    fontWeight: 'bold'
+                  }}>
+                    {isEsp32Active ? realtimeData.db_avg_status : summaryStats.status}
+                  </span>
+                </p>
+              </span>
+            </div>
           </div>
+
         </div>
 
         {/* Main Grid Layout */}
