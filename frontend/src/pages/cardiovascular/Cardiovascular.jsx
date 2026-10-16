@@ -311,7 +311,7 @@ export default function Cardiovascular() {
 
   return (
 
-    
+
     <div className="cardio-root" style={{ display: 'flex', backgroundColor: '#e2e8f0', minHeight: '100vh', paddingTop: '84px', fontFamily: 'Segoe UI, sans-serif', color: '#1e293b' }}>
       {/* the site's CSS reset removes default heading weight - restore it for this page */}
       <style>{`.cardio-root h2, .cardio-root h3, .cardio-root h4 { font-weight: 700; } @media (max-width: 1100px) { .cardio-grid { grid-template-columns: 1fr !important; } }`}</style>
@@ -349,32 +349,32 @@ export default function Cardiovascular() {
             </div>
 
 
-          
-              <div style={{ flex: 1, height: '70px', overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative' }}>
-                <svg width="100%" height="65" viewBox="0 0 600 65" preserveAspectRatio="none">
-                  {/* Background Glowing Heart */}
-                  <path
-                    d="M300,52 C275,38 220,24 220,12 C220,4 230,0 242,0 C256,0 275,10 300,28 C325,10 344,0 358,0 C370,0 380,4 380,12 C380,24 325,38 300,52 Z"
-                    fill="none"
-                    stroke="#38bdf8"
-                    strokeWidth="2"
-                    strokeOpacity="0.5"
-                    filter="drop-shadow(0px 0px 6px rgba(56, 189, 248, 0.6))"
-                  />
-                  {/* Animated EKG Line passing through the heart */}
-                  <path
-                    className="ekg-animated-path"
-                    d="M0,32 L200,32 L215,18 L230,48 L245,10 L260,52 L275,32 L325,32 L340,18 L355,48 L370,10 L385,52 L400,32 L600,32"
-                    fill="none"
-                    stroke="#38bdf8"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    filter="drop-shadow(0px 0px 8px rgba(56, 189, 248, 0.9))"
-                  />
-                </svg>
-              </div>
-            
+
+            <div style={{ flex: 1, height: '70px', overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative' }}>
+              <svg width="100%" height="65" viewBox="0 0 600 65" preserveAspectRatio="none">
+                {/* Background Glowing Heart */}
+                <path
+                  d="M300,52 C275,38 220,24 220,12 C220,4 230,0 242,0 C256,0 275,10 300,28 C325,10 344,0 358,0 C370,0 380,4 380,12 C380,24 325,38 300,52 Z"
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="2"
+                  strokeOpacity="0.5"
+                  filter="drop-shadow(0px 0px 6px rgba(56, 189, 248, 0.6))"
+                />
+                {/* Animated EKG Line passing through the heart */}
+                <path
+                  className="ekg-animated-path"
+                  d="M0,32 L200,32 L215,18 L230,48 L245,10 L260,52 L275,32 L325,32 L340,18 L355,48 L370,10 L385,52 L400,32 L600,32"
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  filter="drop-shadow(0px 0px 8px rgba(56, 189, 248, 0.9))"
+                />
+              </svg>
+            </div>
+
 
 
             {/* backend connectivity */}
@@ -472,7 +472,7 @@ export default function Cardiovascular() {
 
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <h4 style={{ margin: '0 0 10px 0', fontSize: '30px', color: '#1e293b' }}>Real-time Vitals Summary</h4>
-              <p style={{ margin: '0 0 15px 0', fontSize: '20px', color: '#151616',fontWeight:'700' }}>
+              <p style={{ margin: '0 0 15px 0', fontSize: '20px', color: '#151616', fontWeight: '700' }}>
                 Live tracking for instantaneous heart rate, blood pressure, and pulse interval.
               </p>
 
@@ -480,13 +480,22 @@ export default function Cardiovascular() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '10px' }}>
                 <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <div>
-                    <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px',fontWeight:'500' }}><Heart size={20} color="#ef4444" className="beating-heart" />  Heart Rate</span>
+                    <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}><Heart size={20} color="#ef4444" className="beating-heart" />  Heart Rate</span>
                     <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.avg_hr : 0} <span style={{ fontSize: '12px' }}>BPM</span></p>
                   </div>
                 </div>
 
                 <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Gauge size={12} color="#2563eb" /> Blood Pressure</span>
+                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span className="pulsing-gauge" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {/* Gauge Outer Arc */}
+                        <path d="M3 15a9 9 0 1 1 18 0" />
+                        {/* Center Needle - Direct straight center eke thiyena needle ekak */}
+                        <line className="gauge-needle" x1="12" y1="15" x2="12" y2="10" />
+                      </svg>
+                    </span>
+                    Blood Pressure</span>
                   <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? `${realtimeData.bp_sys}/${realtimeData.bp_dia}` : '120/80'} <span style={{ fontSize: '12px' }}>mmHg</span></p>
                 </div>
                 <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={12} color="#10b981" /> Pulse Interval</span>

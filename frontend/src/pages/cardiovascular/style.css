@@ -24,3 +24,28 @@
   animation: heartPulse 1.2s infinite ease-in-out;
   transform-origin: center;
 }
+
+/*Gauge animation */
+@keyframes gaugeTilt {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(10deg) scale(1.1); } /* Tikak herila loku wenawa */
+  50% { transform: rotate(0deg) scale(1); }    /* Aye normal enawa */
+  75% { transform: rotate(-10deg) scale(1.05); } /* Anith paththata poddak herila */
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.pulsing-gauge {
+  display: inline-block;
+  animation: gaugeTilt 1.8s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes needleMove {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(45deg); } /* Needle eka rotate wena angle eka */
+}
+
+.gauge-needle {
+  transform-origin: 12px 12px; /* Line eka karakenna ona centre point eka */
+  animation: needleMove 1.5s infinite ease-in-out;
+}
