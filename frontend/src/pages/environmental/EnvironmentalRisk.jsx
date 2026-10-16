@@ -84,7 +84,7 @@ export default function EnvironmentalRisk() {
               Environmental Risk Mapping
             </h1>
             <p className="mt-2 max-w-2xl text-lg text-slate-600">
-              Smart safety zones that detect high-risk areas from light, obstacles, floor moisture and motion — with live cameras and YOLO detection.
+              Smart safety zones that detect high-risk areas from light, obstacles, floor moisture and motion — with live camera.
             </p>
           </div>
 
