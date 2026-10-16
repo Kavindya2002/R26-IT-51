@@ -4,12 +4,15 @@ import { LineChart, Line, XAxis, YAxis, Legend, CartesianGrid, Tooltip, Responsi
 import { ArrowLeft, Heart, Activity, Gauge, Cpu, CheckCircle, Wifi, WifiOff, Battery, Server } from 'lucide-react';
 import patientImg from './patient.webp';
 
+import '../cardiovascular/style.css';
+
 // ─────────────────────────────────────────────────────────────
 //  Heart Rate & Blood Pressure Monitoring
 //  Owner: Hirushi Divyanjalie
 //  Backend: backend/cardiovascular/server.py   (FastAPI, port 5052)
 //  Backend URL is read from .env → VITE_CARDIO_API_URL
 // ─────────────────────────────────────────────────────────────
+
 export const API_URL = import.meta.env.VITE_CARDIO_API_URL || 'http://127.0.0.1:5052';
 const WS_URL = API_URL.replace(/^http/, 'ws') + '/ws/client';
 
@@ -307,6 +310,8 @@ export default function Cardiovascular() {
   }, [annotationChartData, eventsData]);
 
   return (
+
+    
     <div className="cardio-root" style={{ display: 'flex', backgroundColor: '#e2e8f0', minHeight: '100vh', paddingTop: '84px', fontFamily: 'Segoe UI, sans-serif', color: '#1e293b' }}>
       {/* the site's CSS reset removes default heading weight - restore it for this page */}
       <style>{`.cardio-root h2, .cardio-root h3, .cardio-root h4 { font-weight: 700; } @media (max-width: 1100px) { .cardio-grid { grid-template-columns: 1fr !important; } }`}</style>
@@ -344,20 +349,7 @@ export default function Cardiovascular() {
             </div>
 
 
-            {/*Heart beat animation */}
-            <>
-              <style>
-                {`
-      @keyframes ekgScan {
-        0% { stroke-dashoffset: 700; }
-        100% { stroke-dashoffset: 0; }
-      }
-      .ekg-animated-path {
-        stroke-dasharray: 700;
-        animation: ekgScan 2.5s linear infinite;
-      }
-    `}
-              </style>
+          
               <div style={{ flex: 1, height: '70px', overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative' }}>
                 <svg width="100%" height="65" viewBox="0 0 600 65" preserveAspectRatio="none">
                   {/* Background Glowing Heart */}
@@ -382,7 +374,7 @@ export default function Cardiovascular() {
                   />
                 </svg>
               </div>
-            </>
+            
 
 
             {/* backend connectivity */}
@@ -455,7 +447,7 @@ export default function Cardiovascular() {
 
 
             {/* card 1: Patient Overview */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px',  boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <h4 style={{ margin: '0 0 15px 0', color: '#1e293b', fontSize: '30px' }}>Patient Overview</h4>
               <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '15px' }}>
                 <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#e2e8f0', overflow: 'hidden' }}>
@@ -468,20 +460,7 @@ export default function Cardiovascular() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={12} color="#ef4444" /> Heart Rate</span>
-                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.avg_hr : 0} <span style={{ fontSize: '12px' }}>BPM</span></p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Gauge size={12} color="#2563eb" /> Blood Pressure</span>
-                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? `${realtimeData.bp_sys}/${realtimeData.bp_dia}` : '120/80'} <span style={{ fontSize: '12px' }}>mmHg</span></p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={12} color="#10b981" /> Pulse Interval</span>
-                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.pulse_interval : 0} <span style={{ fontSize: '12px' }}>ms</span></p>
-                </div>
-              </div>
+
             </div>
 
 
@@ -492,27 +471,29 @@ export default function Cardiovascular() {
 
 
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h4 style={{ margin: '0 0 10px 0', fontSize: '20px', color: '#1e293b' }}>Clinical Summary & Quick Stats</h4>
-              <p style={{ margin: '0 0 15px 0', fontSize: '14px', color: '#64748b' }}>
-                Real-time aggregate analytics and historical thresholds for patient monitoring.
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '30px', color: '#1e293b' }}>Real-time Vitals Summary</h4>
+              <p style={{ margin: '0 0 15px 0', fontSize: '20px', color: '#151616',fontWeight:'700' }}>
+                Live tracking for instantaneous heart rate, blood pressure, and pulse interval.
               </p>
-              {/* මෙහි ඔබට අවශ්‍ය වෙනත් දත්ත හෝ සාරාංශයක් පෙන්විය හැක */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>HR Range (Live)</span>
-                  <p style={{ margin: '2px 0 0 0', fontWeight: 'bold', fontSize: '14px' }}>{summaryStats.hrRange}</p>
+
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '10px' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px',fontWeight:'500' }}><Heart size={20} color="#ef4444" className="beating-heart" />  Heart Rate</span>
+                    <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.avg_hr : 0} <span style={{ fontSize: '12px' }}>BPM</span></p>
+                  </div>
                 </div>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>BP Range</span>
-                  <p style={{ margin: '2px 0 0 0', fontWeight: 'bold', fontSize: '14px' }}>{summaryStats.bpRange}</p>
+
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Gauge size={12} color="#2563eb" /> Blood Pressure</span>
+                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? `${realtimeData.bp_sys}/${realtimeData.bp_dia}` : '120/80'} <span style={{ fontSize: '12px' }}>mmHg</span></p>
                 </div>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>Overall Status</span>
-                  <p style={{ margin: '2px 0 0 0', fontWeight: 'bold', fontSize: '14px', color: summaryStats.status === 'Normal' ? '#22c55e' : '#ef4444' }}>
-                    {summaryStats.status}
-                  </p>
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={12} color="#10b981" /> Pulse Interval</span>
+                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.pulse_interval : 0} <span style={{ fontSize: '12px' }}>ms</span></p>
                 </div>
               </div>
+
             </div>
 
 
