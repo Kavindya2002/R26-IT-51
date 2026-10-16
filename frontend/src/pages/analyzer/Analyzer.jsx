@@ -89,19 +89,6 @@ function getInitials(name) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-// Builds a repeating signal-trace path (used for the drifting background waves)
-function wavePath(mid, amp, period, cycles, jitter = 0) {
-  let d = `M0 ${mid}`;
-  const steps = cycles * 24;
-  for (let i = 1; i <= steps; i++) {
-    const x = (i / 24) * period;
-    const wobble = jitter ? Math.sin(i * 1.7) * jitter : 0;
-    const y = mid + Math.sin((i / 24) * Math.PI * 2) * amp + wobble;
-    d += ` L${x.toFixed(1)} ${y.toFixed(1)}`;
-  }
-  return d;
-}
-
 function NameGate({ onStart }) {
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -132,100 +119,61 @@ function NameGate({ onStart }) {
     onStart(trimmed);
   }
 
-  const CYAN = "#22D3EE";
-  const BLUE = "#3B82F6";
+  const BLUE = "#1769E0";
+  const BLUE_DARK = "#0F52B8";
+  const NAVY = "#0B1F33";
 
   return (
     <div
       className="relative min-h-screen flex items-center justify-center px-6 pt-28 pb-12 overflow-hidden"
       style={{
-        background:
-          "radial-gradient(ellipse at 20% 10%, #0E2C52 0%, transparent 55%), radial-gradient(ellipse at 85% 90%, #08304A 0%, transparent 50%), linear-gradient(180deg, #040E1C 0%, #071A31 100%)"
+        background: "linear-gradient(160deg, #E3EFFC 0%, #F1F7FE 50%, #DDEEF8 100%)"
       }}
     >
       <style>{`
         @keyframes ng-pulse {
-          0%   { transform: scale(1);   opacity: .55; }
-          100% { transform: scale(2.2); opacity: 0;   }
+          0%   { transform: scale(1);   opacity: .7; }
+          100% { transform: scale(1.9); opacity: 0;  }
         }
-        @keyframes ng-spin { to { transform: rotate(360deg); } }
-        @keyframes ng-scan {
-          0%   { top: -10%; opacity: 0; }
-          10%  { opacity: 1; }
-          90%  { opacity: 1; }
-          100% { top: 110%; opacity: 0; }
-        }
-        @keyframes ng-wave { to { transform: translateX(-600px); } }
-        @keyframes ng-grid {
-          to { background-position: 0 48px, 48px 0; }
-        }
+        @keyframes ng-grid { to { background-position: 0 56px, 56px 0; } }
         @keyframes ng-ecg-loop {
           0%   { stroke-dashoffset: 260; }
           55%  { stroke-dashoffset: 0; }
           100% { stroke-dashoffset: -260; }
         }
-        @keyframes ng-blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+        @keyframes ng-blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
         @keyframes ng-sheen {
           0%   { transform: translateX(-120%) skewX(-12deg); }
           60%,100% { transform: translateX(120%) skewX(-12deg); }
         }
-        @keyframes ng-border-run {
-          to { background-position: 200% 0; }
-        }
+        @keyframes ng-float-a { 0%,100% { transform: translate(0,0); } 50% { transform: translate(40px,-30px); } }
+        @keyframes ng-float-b { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-50px,35px); } }
         @media (prefers-reduced-motion: reduce) {
           .ng-anim, .ng-anim * { animation: none !important; }
         }
       `}</style>
 
-      {/* ── Technical background layers ── */}
+      {/* Light technical background: visible grid + soft colour glows */}
       <div aria-hidden className="ng-anim pointer-events-none absolute inset-0">
-        {/* moving grid */}
         <div
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(34,211,238,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.07) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-            animation: "ng-grid 6s linear infinite",
-            maskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)"
+              "linear-gradient(rgba(23,105,224,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(23,105,224,0.10) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            animation: "ng-grid 10s linear infinite",
+            maskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)"
           }}
         />
-
-        {/* drifting sensor waveforms */}
-        {[
-          { top: "14%", mid: 30, amp: 18, jitter: 4, dur: 14, color: CYAN, op: 0.22 },
-          { top: "46%", mid: 30, amp: 10, jitter: 7, dur: 22, color: BLUE, op: 0.2 },
-          { top: "78%", mid: 30, amp: 24, jitter: 2, dur: 18, color: CYAN, op: 0.16 }
-        ].map((w, i) => (
-          <div key={i} className="absolute left-0 w-full overflow-hidden" style={{ top: w.top, height: 60 }}>
-            <svg
-              width="1800"
-              height="60"
-              viewBox="0 0 1800 60"
-              fill="none"
-              stroke={w.color}
-              strokeOpacity={w.op}
-              strokeWidth="1.6"
-              style={{ animation: `ng-wave ${w.dur}s linear infinite` }}
-            >
-              <path d={wavePath(w.mid, w.amp, 300, 6, w.jitter)} />
-            </svg>
-          </div>
-        ))}
-
-        {/* vertical scan line */}
         <div
-          className="absolute inset-x-0 h-24"
-          style={{
-            background: "linear-gradient(180deg, transparent, rgba(34,211,238,0.10), transparent)",
-            animation: "ng-scan 7s ease-in-out infinite"
-          }}
+          className="absolute -top-32 -left-24 w-[32rem] h-[32rem] rounded-full blur-3xl"
+          style={{ background: "rgba(59,130,246,0.30)", animation: "ng-float-a 16s ease-in-out infinite" }}
         />
-
-        {/* edge glows */}
-        <div className="absolute -top-40 left-1/4 w-[34rem] h-[34rem] rounded-full blur-3xl" style={{ background: "rgba(59,130,246,0.14)" }} />
-        <div className="absolute -bottom-48 right-1/4 w-[34rem] h-[34rem] rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.10)" }} />
+        <div
+          className="absolute -bottom-40 -right-24 w-[34rem] h-[34rem] rounded-full blur-3xl"
+          style={{ background: "rgba(45,212,191,0.26)", animation: "ng-float-b 20s ease-in-out infinite" }}
+        />
       </div>
 
       {/* ── Card ── */}
@@ -233,124 +181,98 @@ function NameGate({ onStart }) {
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-lg rounded-3xl p-8 sm:p-10 text-white"
+        className="relative w-full max-w-2xl rounded-[2rem] bg-white p-10 sm:p-14"
         style={{
-          background: "linear-gradient(160deg, rgba(14,36,66,0.88), rgba(7,22,42,0.92))",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          border: "1px solid rgba(120,180,255,0.18)",
-          boxShadow: "0 30px 80px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)"
+          color: NAVY,
+          border: "2px solid #B9D0EA",
+          boxShadow: "0 40px 90px -30px rgba(23,105,224,0.45), 0 10px 30px rgba(11,31,51,0.10)"
         }}
       >
-        {/* HUD corner brackets */}
+        {/* HUD corner brackets (solid blue = clearly visible on a projector) */}
         {[
-          "top-3 left-3 border-t-2 border-l-2 rounded-tl-lg",
-          "top-3 right-3 border-t-2 border-r-2 rounded-tr-lg",
-          "bottom-3 left-3 border-b-2 border-l-2 rounded-bl-lg",
-          "bottom-3 right-3 border-b-2 border-r-2 rounded-br-lg"
+          "top-4 left-4 border-t-[3px] border-l-[3px] rounded-tl-xl",
+          "top-4 right-4 border-t-[3px] border-r-[3px] rounded-tr-xl",
+          "bottom-4 left-4 border-b-[3px] border-l-[3px] rounded-bl-xl",
+          "bottom-4 right-4 border-b-[3px] border-r-[3px] rounded-br-xl"
         ].map((c) => (
-          <span
-            key={c}
-            aria-hidden
-            className={`absolute w-5 h-5 ${c}`}
-            style={{ borderColor: "rgba(34,211,238,0.55)" }}
-          />
+          <span key={c} aria-hidden className={`absolute w-6 h-6 ${c}`} style={{ borderColor: BLUE }} />
         ))}
 
-        {/* animated top edge */}
-        <div
-          aria-hidden
-          className="ng-anim absolute inset-x-10 top-0 h-[2px]"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${CYAN}, ${BLUE}, ${CYAN}, transparent)`,
-            backgroundSize: "200% 100%",
-            animation: "ng-border-run 4s linear infinite"
-          }}
-        />
-
         {/* Avatar + status */}
-        <div className="flex items-center gap-4">
-          <div className="relative w-16 h-16 shrink-0">
+        <div className="flex items-center gap-6">
+          <div className="relative w-24 h-24 shrink-0">
             {!reduceMotion && (
               <>
                 <span
                   aria-hidden
-                  className="ng-anim absolute inset-0 rounded-2xl border"
-                  style={{ borderColor: CYAN, animation: "ng-pulse 2.8s ease-out infinite" }}
+                  className="ng-anim absolute inset-0 rounded-3xl border-[3px]"
+                  style={{ borderColor: BLUE, animation: "ng-pulse 2.6s ease-out infinite" }}
                 />
                 <span
                   aria-hidden
-                  className="ng-anim absolute inset-0 rounded-2xl border"
-                  style={{ borderColor: BLUE, animation: "ng-pulse 2.8s ease-out 1.4s infinite" }}
+                  className="ng-anim absolute inset-0 rounded-3xl border-[3px]"
+                  style={{ borderColor: "#12B5A6", animation: "ng-pulse 2.6s ease-out 1.3s infinite" }}
                 />
               </>
             )}
-            {/* rotating radar ring */}
-            <div className="absolute inset-0 rounded-2xl overflow-hidden">
-              <div
-                className="ng-anim absolute -inset-1/2"
-                style={{
-                  background: `conic-gradient(from 0deg, transparent 0deg, ${CYAN} 70deg, transparent 140deg)`,
-                  animation: "ng-spin 3.2s linear infinite"
-                }}
-              />
-              <motion.div
-                animate={{ scale: trimmed ? 1.04 : 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 18 }}
-                className="absolute inset-[2px] rounded-[14px] flex items-center justify-center"
-                style={{ background: "linear-gradient(145deg, #0F3A66, #0A2342)", color: CYAN }}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  {initials ? (
-                    <motion.span
-                      key="initials"
-                      initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
-                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                      exit={{ opacity: 0, scale: 0.6 }}
-                      transition={{ duration: 0.18 }}
-                      className="font-display text-xl font-bold tracking-wide"
-                    >
-                      {initials}
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="icon"
-                      initial={{ opacity: 0, scale: 0.6 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.6 }}
-                      transition={{ duration: 0.18 }}
-                    >
-                      <User size={28} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </div>
+            <motion.div
+              animate={{ scale: trimmed ? 1.06 : 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 18 }}
+              className="relative w-24 h-24 rounded-3xl flex items-center justify-center text-white"
+              style={{
+                background: `linear-gradient(135deg, ${BLUE}, ${BLUE_DARK})`,
+                boxShadow: "0 14px 30px -8px rgba(23,105,224,0.6)"
+              }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {initials ? (
+                  <motion.span
+                    key="initials"
+                    initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    exit={{ opacity: 0, scale: 0.6 }}
+                    transition={{ duration: 0.18 }}
+                    className="font-display text-4xl font-bold tracking-wide"
+                  >
+                    {initials}
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="icon"
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.6 }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <User size={44} strokeWidth={2.2} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-2 font-mono text-sm" style={{ color: CYAN }}>
+            <p className="flex items-center gap-3 text-xl font-bold" style={{ color: "#0B6E7B" }}>
               <span
-                className="ng-anim w-2 h-2 rounded-full"
-                style={{ background: CYAN, boxShadow: `0 0 10px ${CYAN}`, animation: "ng-blink 1.6s ease-in-out infinite" }}
+                className="ng-anim w-3.5 h-3.5 rounded-full"
+                style={{ background: "#12B76A", animation: "ng-blink 1.6s ease-in-out infinite" }}
               />
               Sensor session ready
             </p>
-            {/* looping heartbeat trace */}
+            {/* looping heartbeat trace (thick + solid so it is visible from far away) */}
             <svg
               aria-hidden
-              viewBox="0 0 200 36"
-              className="mt-1 h-9 w-full max-w-[220px]"
+              viewBox="0 0 200 40"
+              className="mt-2 h-10 w-full max-w-[260px]"
               fill="none"
-              stroke={CYAN}
-              strokeOpacity="0.8"
-              strokeWidth="2"
+              stroke={BLUE}
+              strokeWidth="3.2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
               <path
                 className="ng-anim"
-                d="M0 20 H60 L70 6 L82 32 L92 12 L100 20 H200"
+                d="M0 22 H60 L70 6 L82 36 L92 12 L100 22 H200"
                 style={{
                   strokeDasharray: 260,
                   strokeDashoffset: 260,
@@ -365,7 +287,8 @@ function NameGate({ onStart }) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.45 }}
-          className="mt-6 font-display text-3xl sm:text-4xl font-bold"
+          className="mt-8 font-display text-4xl sm:text-5xl font-bold leading-tight"
+          style={{ color: NAVY }}
         >
           Who's wearing the device?
         </motion.h1>
@@ -374,7 +297,8 @@ function NameGate({ onStart }) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.45 }}
-          className="mt-3 text-lg text-white/80 leading-relaxed"
+          className="mt-4 text-xl sm:text-2xl leading-relaxed"
+          style={{ color: "#1B2B3C" }}
         >
           Enter the name of the person currently wearing the fall-detection sensor. This links
           live readings to a session record and keeps history separated between different
@@ -386,22 +310,22 @@ function NameGate({ onStart }) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.45 }}
-          className="mt-8 space-y-5"
+          className="mt-10 space-y-6"
         >
           <div className="relative">
             <div
               aria-hidden
-              className={`absolute -inset-1 rounded-3xl blur-md transition-opacity duration-300 ${
+              className={`absolute -inset-1.5 rounded-[1.6rem] blur-md transition-opacity duration-300 ${
                 focused ? "opacity-100" : "opacity-0"
               }`}
-              style={{ background: "rgba(34,211,238,0.28)" }}
+              style={{ background: "rgba(23,105,224,0.35)" }}
             />
             <div className="relative">
               <User
-                size={20}
+                size={28}
                 aria-hidden
-                className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-200"
-                style={{ color: focused || trimmed ? CYAN : "rgba(255,255,255,0.4)" }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 transition-colors duration-200"
+                style={{ color: focused || trimmed ? BLUE : "#5B7088" }}
               />
               <input
                 type="text"
@@ -414,10 +338,10 @@ function NameGate({ onStart }) {
                 autoComplete="name"
                 autoFocus
                 disabled={saving}
-                className="w-full rounded-2xl pl-14 pr-5 py-4 text-lg text-white outline-none transition-colors placeholder:text-white/45 disabled:opacity-70"
+                className="w-full bg-white rounded-2xl pl-16 pr-6 py-5 text-2xl font-medium outline-none transition-colors placeholder:text-[#6B7F95] disabled:opacity-70"
                 style={{
-                  background: "rgba(6,20,40,0.75)",
-                  border: `1.5px solid ${focused ? CYAN : "rgba(255,255,255,0.22)"}`
+                  color: NAVY,
+                  border: `3px solid ${focused ? BLUE : "#7A9BC0"}`
                 }}
               />
             </div>
@@ -429,33 +353,32 @@ function NameGate({ onStart }) {
             whileHover={canSubmit && !reduceMotion ? { y: -2 } : undefined}
             whileTap={canSubmit && !reduceMotion ? { scale: 0.98 } : undefined}
             transition={{ type: "spring", stiffness: 400, damping: 22 }}
-            className="group relative w-full overflow-hidden font-bold text-lg py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+            className="group relative w-full overflow-hidden font-bold text-2xl py-5 rounded-2xl text-white disabled:opacity-45 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4"
             style={{
-              color: "#03121F",
-              outlineColor: CYAN,
-              background: `linear-gradient(90deg, ${CYAN} 0%, #38BDF8 55%, ${BLUE} 100%)`,
-              boxShadow: canSubmit ? "0 14px 34px -10px rgba(34,211,238,0.6)" : "none"
+              outlineColor: BLUE,
+              background: `linear-gradient(90deg, ${BLUE} 0%, ${BLUE_DARK} 100%)`,
+              boxShadow: canSubmit ? "0 18px 36px -12px rgba(23,105,224,0.7)" : "none"
             }}
           >
             {canSubmit && (
               <span
                 aria-hidden
-                className="ng-anim absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                className="ng-anim absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent"
                 style={{ animation: "ng-sheen 3s ease-in-out infinite" }}
               />
             )}
-            <span className="relative flex items-center justify-center gap-2">
+            <span className="relative flex items-center justify-center gap-3">
               {saving ? (
                 <>
-                  <Loader2 size={20} className="animate-spin" />
+                  <Loader2 size={28} className="animate-spin" />
                   Starting session…
                 </>
               ) : (
                 <>
                   Start Live Monitoring
                   <ArrowRight
-                    size={20}
-                    className="transition-transform duration-200 group-hover:translate-x-1"
+                    size={28}
+                    className="transition-transform duration-200 group-hover:translate-x-1.5"
                   />
                 </>
               )}
@@ -468,7 +391,8 @@ function NameGate({ onStart }) {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="text-sm text-white/55 text-center overflow-hidden"
+                className="text-lg font-medium text-center overflow-hidden"
+                style={{ color: "#33475B" }}
               >
                 Type a name to enable the button
               </motion.p>
@@ -481,10 +405,10 @@ function NameGate({ onStart }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3"
+            className="mt-8 flex items-start gap-4 rounded-2xl border-2 border-[#F2D58A] bg-[#FFF3D6] px-5 py-4"
           >
-            <Database size={18} className="mt-0.5 shrink-0 text-amber-300" />
-            <p className="text-sm text-white/75 leading-relaxed">
+            <Database size={26} className="mt-0.5 shrink-0 text-[#B34700]" />
+            <p className="text-lg leading-relaxed text-[#6B4300]">
               Database not connected — sessions won't be saved. See README to connect Supabase.
             </p>
           </motion.div>
