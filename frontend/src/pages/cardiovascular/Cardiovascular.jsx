@@ -441,7 +441,7 @@ export default function Cardiovascular() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
 
           {/* ── TOP ROW: Patient Overview (Left) + New Wide Card (Right) ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.5fr', gap: '20px' }}>
 
 
 
@@ -525,7 +525,6 @@ export default function Cardiovascular() {
 
 
 
-          {/* ── BOTTOM ROW:  Columns 3 ක් ── */}
           {/* ── BOTTOM ROW: 3 columns ── */}
           <div className="cardio-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr', gap: '20px', alignItems: 'start' }}>
             {/* BOTTOM COLUMN 1: Annotations & Advanced PPG Waveforms */}
@@ -533,21 +532,20 @@ export default function Cardiovascular() {
 
               {/* card 2: annotations */}
               <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                <h4 style={{ margin: '0 0 15px 0' }}> Annotations</h4>
+                <h4 style={{ margin: '0 0 15px 0', fontSize:'30px' }}> Annotations</h4>
                 <form onSubmit={handleAddEvent} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }} />
-                    <select value={activityType} onChange={(e) => setActivityType(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}>
+                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
+                    <select value={activityType} onChange={(e) => setActivityType(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }}>
                       <option value="Medication">Medication</option>
                       <option value="Exercise">Exercise</option>
-                      <option value="Meditation">Meditation</option>
                       <option value="Sleep">Sleep</option>
                     </select>
-                    <input type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }} />
+                    <input type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <input type="text" placeholder="Notes..." value={notes} onChange={(e) => setNotes(e.target.value)} style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }} />
-                    <button type="submit" style={{ backgroundColor: '#0e7490', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer' }}>Add Event</button>
+                    <input type="text" placeholder="Notes..." value={notes} onChange={(e) => setNotes(e.target.value)} style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
+                    <button type="submit" style={{ backgroundColor: '#0e7490', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '20px', cursor: 'pointer' }}>Add Event</button>
                   </div>
                 </form>
                 <div style={{ height: '200px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '10px', border: '1px solid #e2e8f0' }}>
@@ -602,7 +600,7 @@ export default function Cardiovascular() {
                       </LineChart>
                     </ResponsiveContainer>
                   ) : (
-                    <p style={{ textAlign: 'center', fontSize: '11px', color: '#94a3b8', paddingTop: '80px' }}>
+                    <p style={{ textAlign: 'center', fontSize: '20px', color: '#94a3b8', paddingTop: '80px' }}>
                       No vitals data for {selectedDate}.
                     </p>
                   )}
