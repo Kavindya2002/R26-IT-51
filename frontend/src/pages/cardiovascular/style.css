@@ -65,3 +65,36 @@
   stroke-dashoffset: 100;
   animation: ecgScanLive 1.5s linear infinite;
 }
+
+
+
+/* blue line appear when page load */
+/* ── Card top blue line: animates in on load, then stays ── */
+.cardio-root .cardio-card {
+  position: relative;
+  overflow: hidden;              /* line eka card eke border-radius ekata clip wenna */
+}
+
+.cardio-root .cardio-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, #1d6fe0, #38bdf8);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: cardTopLine 1s ease-out forwards;   /* forwards = iwara wunata passe permanent */
+}
+
+@keyframes cardTopLine {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* cards ekin eka passe ekak ena widiyata (stagger) */
+.cardio-root .cardio-card:nth-child(1)::before { animation-delay: 0.0s; }
+.cardio-root .cardio-card:nth-child(2)::before { animation-delay: 0.15s; }
+.cardio-root .cardio-card:nth-child(3)::before { animation-delay: 0.3s; }
+

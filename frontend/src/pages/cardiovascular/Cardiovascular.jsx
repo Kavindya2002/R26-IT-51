@@ -448,7 +448,7 @@ export default function Cardiovascular() {
 
 
             {/* card 1: Patient Overview */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <h4 style={{ margin: '0 0 15px 0', color: '#1e293b', fontSize: '30px' }}>Patient Overview</h4>
               <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '15px' }}>
                 <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#e2e8f0', overflow: 'hidden' }}>
@@ -469,7 +469,7 @@ export default function Cardiovascular() {
 
 
 
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <h4 style={{ margin: '0 0 10px 0', fontSize: '30px', color: '#1e293b' }}>Real-time Vitals Summary</h4>
               <p style={{ margin: '0 0 15px 0', fontSize: '20px', color: '#151616', fontWeight: '700' }}>
                 Live tracking for instantaneous heart rate, blood pressure, and pulse interval.
@@ -531,7 +531,7 @@ export default function Cardiovascular() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
               {/* card 2: annotations */}
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                 <h4 style={{ margin: '0 0 15px 0', fontSize:'30px' }}> Annotations</h4>
                 <form onSubmit={handleAddEvent} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -545,7 +545,7 @@ export default function Cardiovascular() {
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <input type="text" placeholder="Notes..." value={notes} onChange={(e) => setNotes(e.target.value)} style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
-                    <button type="submit" style={{ backgroundColor: '#0e7490', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '20px', cursor: 'pointer' }}>Add Event</button>
+                    <button type="submit" style={{ backgroundColor: '#1d6fe0', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '20px', cursor: 'pointer' }}>Add Event</button>
                   </div>
                 </form>
                 <div style={{ height: '200px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '10px', border: '1px solid #e2e8f0' }}>
@@ -608,11 +608,11 @@ export default function Cardiovascular() {
               </div>
 
               {/* Module 5: Device Health & Management */}
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                <h4 style={{ margin: '0 0 10px 0' }}>Device Health</h4>
-                <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', fontSize: '14px' }}>Device & Sensor Diagnostics</p>
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize:'30px' }}>Device Health</h4>
+                <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', fontSize: '20px' }}>Device & Sensor Diagnostics</p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '17px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Cpu size={14} /> ESP32: <span style={{ color: isEsp32Active ? '#22c55e' : '#ef4444', fontWeight: 'bold' }}>{isEsp32Active ? 'Active' : 'Offline'}</span></div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle size={14} /> MAX30102: <span style={{ color: isEsp32Active && realtimeData.status === 'Measuring' ? '#22c55e' : '#d97706', fontWeight: 'bold' }}>{!isEsp32Active ? 'Offline' : realtimeData.status === 'Measuring' ? 'Measuring' : 'No finger'}</span></div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Battery size={14} /> Battery: <span style={{ fontWeight: 'bold' }}>{isEsp32Active && realtimeData.battery_level != null ? `${realtimeData.battery_level}%${realtimeData.is_charging ? ' (charging)' : ''}` : 'N/A'}</span></div>
@@ -631,11 +631,11 @@ export default function Cardiovascular() {
 
 
               {/* card 3: Advanced PPG Diagnostics */}
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                 <h4 style={{ margin: '0 0 10px 0',fontSize:'30px' }}>Advanced PPG Waveforms</h4>
 
                 <span style={{ fontSize: '20px', color: '#0a0a0a' }}>Real-time Heart Rate</span>
-                <div style={{ height: '200px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
+                <div style={{ height: '250px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
 
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
@@ -744,11 +744,11 @@ export default function Cardiovascular() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
               {/* Module 3: Historical Vitals Trends */}
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                 <h4 style={{ margin: '0 0 10px 0', fontSize:'30px' }}>Historical Vitals Trends</h4>
                 <span style={{ fontSize: '20px', fontWeight: 'bold' }}>Recent Vitals Trend ({timeframe.toUpperCase()})</span>
 
-                <div style={{ height: '310px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
+                <div style={{ height: '360px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
                   {longTermData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={longTermData} margin={{ top: 10, right: 10, left: 5, bottom: 5 }}>
@@ -831,7 +831,7 @@ export default function Cardiovascular() {
 
 
         {/* Database Records Block */}
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', flex: 1, marginTop:'20px' }}>
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', flex: 1, marginTop:'20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ fontSize: '20px', fontWeight: 'bold' }}>Database Records ({timeframe.toUpperCase()})</span>
                   <span style={{ fontSize: '15px', color: '#061114' }}>Total: {recentLogs.length} Records</span>
@@ -845,7 +845,7 @@ export default function Cardiovascular() {
                   </thead>
                   <tbody>
                     {recentLogs.length === 0 ? (
-                      <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8',fontSize:'15px' }}>No records found for selected timeframe.</td></tr>
+                      <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8',fontSize:'17px' }}>No records found for selected timeframe.</td></tr>
                     ) : (
                       recentLogs.slice(0, 5).map((log, index) => (
                         <tr key={index}>
