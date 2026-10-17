@@ -485,7 +485,7 @@ export default function Cardiovascular() {
                 </div>
 
                 <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500'  }}>
+                  <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
                     <span className="pulsing-gauge" style={{ display: 'inline-flex', alignItems: 'center' }}>
                       <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         {/* Gauge Outer Arc */}
@@ -497,7 +497,16 @@ export default function Cardiovascular() {
                     Blood Pressure</span>
                   <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? `${realtimeData.bp_sys}/${realtimeData.bp_dia}` : '120/80'} <span style={{ fontSize: '12px' }}>mmHg</span></p>
                 </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={12} color="#10b981" /> Pulse Interval</span>
+
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px',fontWeight:'500' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <svg width="30" height="25" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {/* ECG machine eke wage line eka (Pulse Wave path) */}
+                        <path className="ecg-live-line" d="M2 12h5l2-5 3 10 3-7 2 2h5" />
+                      </svg>
+                    </span>
+                    Pulse Interval</span>
                   <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.pulse_interval : 0} <span style={{ fontSize: '12px' }}>ms</span></p>
                 </div>
               </div>
@@ -516,7 +525,7 @@ export default function Cardiovascular() {
 
 
 
-          {/* ── BOTTOM ROW: ඉතිරි Cards සදහා Columns 3 ක් ── */}
+          {/* ── BOTTOM ROW:  Columns 3 ක් ── */}
           {/* ── BOTTOM ROW: 3 columns ── */}
           <div className="cardio-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr', gap: '20px', alignItems: 'start' }}>
             {/* BOTTOM COLUMN 1: Annotations & Advanced PPG Waveforms */}

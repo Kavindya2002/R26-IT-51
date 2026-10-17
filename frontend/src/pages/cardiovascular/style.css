@@ -49,3 +49,19 @@
   transform-origin: 12px 12px; /* Line eka karakenna ona centre point eka */
   animation: needleMove 1.5s infinite ease-in-out;
 }
+
+/*pulse interval animation*/
+@keyframes ecgScanLive {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ecg-live-line {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: ecgScanLive 1.5s linear infinite;
+}
