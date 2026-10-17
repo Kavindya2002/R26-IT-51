@@ -63,7 +63,7 @@ export default function SensorCard({ device, onChanged }) {
           hint={`Raw ADC: ${s.moisture ?? "-"} | dry baseline: ${device.moisture_dry ?? "-"}`}
         />
         <Metric icon={Footprints} label="Motion" value={device.motion_active ? "YES" : "NO"} />
-        <Metric icon={Thermometer} label="Temperature" value={typeof s.temperature === "number" ? `${num(s.temperature)} °C` : "-"} />
+        
       </div>
 
       <button

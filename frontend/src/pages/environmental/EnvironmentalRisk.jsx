@@ -84,7 +84,7 @@ export default function EnvironmentalRisk() {
               Environmental Risk Mapping
             </h1>
             <p className="mt-2 max-w-2xl text-lg text-slate-600">
-              Smart safety zones that detect high-risk areas from light, obstacles, floor moisture and motion — with live cameras and YOLO detection.
+              Smart safety zones that detect high-risk areas from light, obstacles, floor moisture and motion 
             </p>
           </div>
 
@@ -120,7 +120,6 @@ python server.py`}</pre>
               <Stat label="Connected" value={sum.online} tone="text-emerald-600" />
               <Stat label="Disconnected" value={sum.offline} tone={sum.offline ? "text-red-600" : "text-ink"} />
               <Stat label="Sensor nodes" value={sum.sensor_nodes} />
-              <Stat label="Cameras" value={sum.cameras} />
               <Stat label="High-risk zones" value={sum.high_risk_zones} tone={sum.high_risk_zones ? "text-red-600" : "text-ink"} />
             </div>
 
@@ -171,21 +170,7 @@ python server.py`}</pre>
               )}
             </Section>
 
-            {/* ── Cameras ── */}
-            <Section icon={Camera} title="Live cameras + YOLO">
-              {cameras.length === 0 ? (
-                <p className="rounded-2xl bg-white/80 p-5 text-slate-600 ring-1 ring-slate-200">
-                  No cameras discovered yet. The ESP32-CAM discovery message is required.
-                </p>
-              ) : (
-                <div className="grid gap-5 lg:grid-cols-2">
-                  {cameras.map((d) => <CameraTile key={d.device_id} device={d} />)}
-                </div>
-              )}
-              {data.yolo?.error && cameras.length > 0 && (
-                <p className="mt-3 text-sm text-amber-700">YOLO: {data.yolo.error}</p>
-              )}
-            </Section>
+            
 
             {/* ── Devices + debug ── */}
             <Section icon={Cpu} title="Devices">
@@ -220,9 +205,7 @@ python server.py`}</pre>
                 Connected = message received within the last {data.offline_timeout}s. Disconnected devices stay listed for identification.
               </p>
 
-              <button onClick={() => setDebugOpen((o) => !o)} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-sky-700">
-                MQTT / YOLO debug <ChevronDown size={16} className={`transition-transform ${debugOpen ? "rotate-180" : ""}`} />
-              </button>
+              
               {debugOpen && (
                 <div className="mt-3 rounded-2xl bg-white p-5 text-sm text-slate-700 ring-1 ring-slate-200">
                   <p>MQTT host: <span className="font-mono">{data.mqtt.host}:{data.mqtt.port}</span> · topic <span className="font-mono">{data.mqtt.topic}</span></p>

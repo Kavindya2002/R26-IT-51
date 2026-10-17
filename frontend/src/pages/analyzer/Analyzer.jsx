@@ -492,7 +492,7 @@ function Panel({ title, icon: Icon, children, className = "", style, delay = 0, 
     </motion.section>
   );
 }
-
+{/*design of badges*/}
 function StatusChip({ color, children }) {
   return (
     <span className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-base font-semibold text-white">
@@ -938,6 +938,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         <div className="container-xl relative">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
+              {/* ───────── end session button ───────── */}
               <button
                 onClick={onEndSession}
                 className="flex items-center gap-2 text-base font-medium text-white/85 hover:text-white mb-3 transition-colors"
@@ -951,7 +952,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
                 Live fall detection
               </p>
             </div>
-
+            {/* ───────── badges ───────── */}
             <div className="flex flex-wrap items-center gap-3">
               <StatusChip color={deviceDot}>{deviceText}</StatusChip>     
               <StatusChip color={serverDot}>{serverText}</StatusChip>
