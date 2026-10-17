@@ -879,7 +879,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         )}
       </AnimatePresence>
 
-           {/* ───────── Top bar: name + status chips + data pipeline ───────── */}
+           {/* ───────── Top bar: name + status chips  ───────── */}
       <div
         className="relative overflow-hidden text-white pt-24 md:pt-28 pb-6"
         style={{
@@ -953,7 +953,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <StatusChip color={deviceDot}>{deviceText}</StatusChip>
+              <StatusChip color={deviceDot}>{deviceText}</StatusChip>     
               <StatusChip color={serverDot}>{serverText}</StatusChip>
               <button
                 onClick={handleReset}
