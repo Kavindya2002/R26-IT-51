@@ -5,7 +5,8 @@ import { ArrowLeft, Heart, Activity, Gauge, Cpu, CheckCircle, Wifi, WifiOff, Bat
 import patientImg from './patient.webp';
 
 import '../cardiovascular/style.css';
-
+//admin
+//AegisCare@2026
 // ─────────────────────────────────────────────────────────────
 //  Heart Rate & Blood Pressure Monitoring
 //  Owner: Hirushi Divyanjalie
@@ -459,8 +460,6 @@ export default function Cardiovascular() {
                   <p style={{ margin: 0, fontSize: '17px', color: '#1a212c', fontWeight: '500' }}>Patient Status: <span style={{ color: '#22c55e', fontWeight: '700', fontSize: '17px' }}>Normal</span></p>
                 </div>
               </div>
-
-
             </div>
 
 
@@ -486,9 +485,9 @@ export default function Cardiovascular() {
                 </div>
 
                 <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500'  }}>
                     <span className="pulsing-gauge" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         {/* Gauge Outer Arc */}
                         <path d="M3 15a9 9 0 1 1 18 0" />
                         {/* Center Needle - Direct straight center eke thiyena needle ekak */}
