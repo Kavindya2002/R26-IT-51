@@ -4,12 +4,16 @@ import { LineChart, Line, XAxis, YAxis, Legend, CartesianGrid, Tooltip, Responsi
 import { ArrowLeft, Heart, Activity, Gauge, Cpu, CheckCircle, Wifi, WifiOff, Battery, Server } from 'lucide-react';
 import patientImg from './patient.webp';
 
+import '../cardiovascular/style.css';
+//admin
+//AegisCare@2026
 // ─────────────────────────────────────────────────────────────
 //  Heart Rate & Blood Pressure Monitoring
 //  Owner: Hirushi Divyanjalie
 //  Backend: backend/cardiovascular/server.py   (FastAPI, port 5052)
 //  Backend URL is read from .env → VITE_CARDIO_API_URL
 // ─────────────────────────────────────────────────────────────
+
 export const API_URL = import.meta.env.VITE_CARDIO_API_URL || 'http://127.0.0.1:5052';
 const WS_URL = API_URL.replace(/^http/, 'ws') + '/ws/client';
 
@@ -107,7 +111,7 @@ export default function Cardiovascular() {
       }
     };
 
- 
+
     ws.onclose = () => { setIsServerConnected(false); setIsEsp32Active(false); };
     ws.onerror = () => { setIsServerConnected(false); setIsEsp32Active(false); };
 
@@ -307,6 +311,8 @@ export default function Cardiovascular() {
   }, [annotationChartData, eventsData]);
 
   return (
+
+
     <div className="cardio-root" style={{ display: 'flex', backgroundColor: '#e2e8f0', minHeight: '100vh', paddingTop: '84px', fontFamily: 'Segoe UI, sans-serif', color: '#1e293b' }}>
       {/* the site's CSS reset removes default heading weight - restore it for this page */}
       <style>{`.cardio-root h2, .cardio-root h3, .cardio-root h4 { font-weight: 700; } @media (max-width: 1100px) { .cardio-grid { grid-template-columns: 1fr !important; } }`}</style>
@@ -316,130 +322,331 @@ export default function Cardiovascular() {
       {/* Main Workspace */}
       <div style={{ flex: 1, padding: '20px 30px', overflowY: 'auto' }}>
 
-        <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '14px', fontSize: '15px', fontWeight: 600, color: '#0369a1', textDecoration: 'none' }}>
-          <ArrowLeft size={18} /> Back to dashboard
-        </Link>
 
-        {/* Top Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#0369a1' }}>Module 03 · Owner: Hirushi Divyanjalie</p>
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Heart Rate & Blood Pressure Monitoring Dashboard</h2>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
-              <Server size={14} color={isServerConnected ? '#22c55e' : '#ef4444'} />
-              <span style={{ fontWeight: 500 }}>Backend: {isServerConnected ? 'Online' : 'Offline'}</span>
-            </span>
-            {/* Header Right Side Status Badge */}
-            <span style={{
-              backgroundColor: '#e2e8f0',
-              padding: '6px 12px',
-              borderRadius: '15px',
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              border: '1px solid #cbd5e1'
-            }}>
-              {isEsp32Active ? (
-                <>
-                  <Wifi size={14} color="#22c55e" />
-                  <span style={{ fontWeight: 500 }}>ESP32: Active</span>
-                  
-                </>
-              ) : (
-                <>
-                  <WifiOff size={14} color="#ef4444" />
-                  <span>ESP32: Disconnected</span>
-                </>
-              )}
-            </span>
-            <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
+        {/*header */}
 
-              <p style={{ margin: 0, fontSize: '12px', color: '#1a212c' }}>
-                Patient Status:
-                <span style={{
-                  color: (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical' || (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical Warning' ? '#ef4444' : '#22c55e',
-                  fontWeight: 'bold'
-                }}>
-                  {isEsp32Active ? realtimeData.db_avg_status : summaryStats.status}
-                </span>
-              </p>
-            </span>
+        <div style={{
+          backgroundColor: '#346086',
+          backgroundImage: `
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+  `,
+          backgroundSize: '30px 30px', // Adjust this value to change grid square size
+          padding: '24px 32px',
+          color: '#ffffff',
+          fontFamily: 'sans-serif'
+        }}>
+          {/* Back/End Session Link */}
+          <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: '#ffff', textDecoration: 'none', paddingLeft: '100px' }}>
+            <ArrowLeft size={18} /> Back to Dashbord
+          </Link>
+
+
+          {/* Top Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px', paddingLeft: '100px' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#e2e6e7' }}>Module 03 · Owner: Hirushi Divyanjalie</p>
+              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Heart Rate & Blood Pressure Monitoring Dashboard</h2>
+            </div>
+
+
+
+            <div style={{ flex: 1, height: '70px', overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative' }}>
+              <svg width="100%" height="65" viewBox="0 0 600 65" preserveAspectRatio="none">
+                {/* Background Glowing Heart */}
+                <path
+                  d="M300,52 C275,38 220,24 220,12 C220,4 230,0 242,0 C256,0 275,10 300,28 C325,10 344,0 358,0 C370,0 380,4 380,12 C380,24 325,38 300,52 Z"
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="2"
+                  strokeOpacity="0.5"
+                  filter="drop-shadow(0px 0px 6px rgba(56, 189, 248, 0.6))"
+                />
+                {/* Animated EKG Line passing through the heart */}
+                <path
+                  className="ekg-animated-path"
+                  d="M0,32 L200,32 L215,18 L230,48 L245,10 L260,52 L275,32 L325,32 L340,18 L355,48 L370,10 L385,52 L400,32 L600,32"
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  filter="drop-shadow(0px 0px 8px rgba(56, 189, 248, 0.9))"
+                />
+              </svg>
+            </div>
+
+
+
+            {/* backend connectivity */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
+                <Server size={18} color={isServerConnected ? '#22c55e' : '#ef4444'} />
+                <span style={{ fontWeight: 700, color: '#0f0f0f', fontSize: '17px' }}>Backend: {isServerConnected ? 'Online' : 'Offline'}</span>
+              </span>
+              {/*esp32 connectivity */}
+              <span style={{
+                backgroundColor: '#f7f7f7',
+                padding: '6px 12px',
+                borderRadius: '15px',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                border: '1px solid #0d0d0e'
+              }}>
+
+
+                {isEsp32Active ? (
+                  <>
+                    <Wifi size={14} color="#22c55e" />
+                    <span style={{ fontWeight: 700, color: '#ef4444', fontSize: '17px' }}>ESP32: Active</span>
+
+                  </>
+                ) : (
+                  <>
+                    <WifiOff size={18} color="#ef4444" />
+                    <span style={{ fontWeight: 700, color: '#0f0f0f', fontSize: '17px' }}>ESP32: Disconnected</span>
+                  </>
+                )}
+              </span>
+
+              <span style={{ backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '15px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #cbd5e1' }}>
+
+                <p style={{ margin: 0, fontSize: '17px', color: '#0f0f0f', fontWeight: 700 }}>
+                  Patient Status:
+                  <span style={{
+                    color: (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical' || (isEsp32Active ? realtimeData.db_avg_status : summaryStats.status) === 'Critical Warning' ? '#ef4444' : '#22c55e',
+                    fontWeight: 'bold'
+                  }}>
+                    {isEsp32Active ? realtimeData.db_avg_status : summaryStats.status}
+                  </span>
+                </p>
+              </span>
+            </div>
           </div>
+
         </div>
 
-        {/* Main Grid Layout */}
+
+        {/*header end*/}
+
+        {/* Main Grid Layout 
         <div className="cardio-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr', gap: '20px' }}>
 
-          {/* COLUMN 1 */}
+          {/* COLUMN 1 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+*/}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
+
+          {/* ── TOP ROW: Patient Overview (Left) + New Wide Card (Right) ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.5fr', gap: '20px' }}>
 
 
 
-            {/* Module 1: Patient Overview */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ margin: '0 0 15px 0', color: '#1e293b' }}>Patient Overview</h4>
+
+
+            {/* card 1: Patient Overview */}
+            <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <h4 style={{ margin: '0 0 15px 0', color: '#1e293b', fontSize: '30px' }}>Patient Overview</h4>
               <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '15px' }}>
                 <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#e2e8f0', overflow: 'hidden' }}>
                   <img src={patientImg} alt="Patient" style={{ width: '100%', height: '100%' }} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '16px' }}>Hirushi Divyanjalie</h3>
-                  <p style={{ margin: '2px 0', fontSize: '12px', color: '#1a212c' }}>User Age: 24 | Blood Group: O+</p>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#1a212c' }}>Patient Status: <span style={{ color: '#22c55e', fontWeight: 'bold' }}>Normal</span></p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={12} color="#ef4444" /> Heart Rate</span>
-                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.avg_hr : 0} <span style={{ fontSize: '12px' }}>BPM</span></p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Gauge size={12} color="#2563eb" /> Blood Pressure</span>
-                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? `${realtimeData.bp_sys}/${realtimeData.bp_dia}` : '120/80'} <span style={{ fontSize: '12px' }}>mmHg</span></p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={12} color="#10b981" /> Pulse Interval</span>
-                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.pulse_interval : 0} <span style={{ fontSize: '12px' }}>ms</span></p>
+                  <h3 style={{ margin: 0, fontSize: '20px' }}>Hirushi Divyanjalie</h3>
+                  <p style={{ margin: '2px 0', fontSize: '17px', color: '#1a212c', fontWeight: '500' }}>User Age: 24 | Blood Group: O+</p>
+                  <p style={{ margin: 0, fontSize: '17px', color: '#1a212c', fontWeight: '500' }}>Patient Status: <span style={{ color: '#22c55e', fontWeight: '700', fontSize: '17px' }}>Normal</span></p>
                 </div>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ margin: '0 0 15px 0' }}>Research Annotations</h4>
-              <form onSubmit={handleAddEvent} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }} />
-                  <select value={activityType} onChange={(e) => setActivityType(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}>
-                    <option value="Medication">Medication</option>
-                    <option value="Exercise">Exercise</option>
-                    <option value="Meditation">Meditation</option>
-                    <option value="Sleep">Sleep</option>
-                  </select>
-                  <input type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }} />
+
+
+
+
+
+
+
+            <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '30px', color: '#1e293b' }}>Real-time Vitals Summary</h4>
+              <p style={{ margin: '0 0 15px 0', fontSize: '20px', color: '#151616', fontWeight: '700' }}>
+                Live tracking for instantaneous heart rate, blood pressure, and pulse interval.
+              </p>
+
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '10px' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}><Heart size={20} color="#ef4444" className="beating-heart" />  Heart Rate</span>
+                    <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.avg_hr : 0} <span style={{ fontSize: '12px' }}>BPM</span></p>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="text" placeholder="Notes..." value={notes} onChange={(e) => setNotes(e.target.value)} style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }} />
-                  <button type="submit" style={{ backgroundColor: '#0e7490', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer' }}>Add Event</button>
+
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
+                    <span className="pulsing-gauge" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {/* Gauge Outer Arc */}
+                        <path d="M3 15a9 9 0 1 1 18 0" />
+                        {/* Center Needle - Direct straight center eke thiyena needle ekak */}
+                        <line className="gauge-needle" x1="12" y1="15" x2="12" y2="10" />
+                      </svg>
+                    </span>
+                    Blood Pressure</span>
+                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? `${realtimeData.bp_sys}/${realtimeData.bp_dia}` : '120/80'} <span style={{ fontSize: '12px' }}>mmHg</span></p>
                 </div>
-              </form>
-              <div style={{ height: '200px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '10px', border: '1px solid #e2e8f0' }}>
-                {annotationChartData.length > 0 ? (
+
+                <div style={{ backgroundColor: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '20px', color: '#070707', display: 'flex', alignItems: 'center', gap: '8px',fontWeight:'500' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <svg width="30" height="25" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {/* ECG machine eke wage line eka (Pulse Wave path) */}
+                        <path className="ecg-live-line" d="M2 12h5l2-5 3 10 3-7 2 2h5" />
+                      </svg>
+                    </span>
+                    Pulse Interval</span>
+                  <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', fontSize: '18px' }}>{isEsp32Active ? realtimeData.pulse_interval : 0} <span style={{ fontSize: '12px' }}>ms</span></p>
+                </div>
+              </div>
+
+            </div>
+
+
+
+          </div>
+
+
+
+
+
+
+
+
+
+          {/* ── BOTTOM ROW: 3 columns ── */}
+          <div className="cardio-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.5fr', gap: '20px', alignItems: 'start' }}>
+            {/* BOTTOM COLUMN 1: Annotations & Advanced PPG Waveforms */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+              {/* card 2: annotations */}
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <h4 style={{ margin: '0 0 15px 0', fontSize:'30px' }}> Annotations</h4>
+                <form onSubmit={handleAddEvent} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
+                    <select value={activityType} onChange={(e) => setActivityType(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }}>
+                      <option value="Medication">Medication</option>
+                      <option value="Exercise">Exercise</option>
+                      <option value="Sleep">Sleep</option>
+                    </select>
+                    <input type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input type="text" placeholder="Notes..." value={notes} onChange={(e) => setNotes(e.target.value)} style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '20px' }} />
+                    <button type="submit" style={{ backgroundColor: '#1d6fe0', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '20px', cursor: 'pointer' }}>Add Event</button>
+                  </div>
+                </form>
+                <div style={{ height: '200px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '10px', border: '1px solid #e2e8f0' }}>
+                  {annotationChartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={annotationChartData} margin={{ top: 20, right: 15, left: 5, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis
+                          dataKey="ts"
+                          type="number"
+                          scale="time"
+                          domain={annotationDomain}
+                          tickFormatter={(t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                          stroke="#64748b"
+                          fontSize={10}
+                          tickCount={5}
+                          height={38}
+                          label={{ value: 'Time', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
+                        />
+                        <YAxis
+                          domain={['auto', 'auto']}
+                          stroke="#64748b"
+                          fontSize={10}
+                          width={55}
+                          label={{ value: 'Heart Rate (BPM)', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
+                        />
+                        <Tooltip
+                          labelFormatter={(t) => new Date(t).toLocaleTimeString()}
+                          contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#0c0c0c', borderRadius: '6px' }}
+                          itemStyle={{ color: '#0c0b0b', fontSize: '12px' }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="hr"
+                          name="Heart Rate (BPM)"
+                          stroke="#252926"
+                          strokeWidth={2}
+                          dot={false}
+                          activeDot={{ r: 4 }}
+                          isAnimationActive={false}
+                        />
+                        {eventsData.map((ev, i) => (
+                          <ReferenceLine
+                            key={ev.id || i}
+                            x={new Date(ev.event_time).getTime()}
+                            stroke={getActivityColor(ev.activity_type)}
+                            strokeWidth={2}
+                            strokeDasharray="4 3"
+                            label={{ value: ev.activity_type, position: 'top', fontSize: '10px', fill: getActivityColor(ev.activity_type) }}
+                          />
+                        ))}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p style={{ textAlign: 'center', fontSize: '20px', color: '#94a3b8', paddingTop: '80px' }}>
+                      No vitals data for {selectedDate}.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Module 5: Device Health & Management */}
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize:'30px' }}>Device Health</h4>
+                <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', fontSize: '20px' }}>Device & Sensor Diagnostics</p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '17px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Cpu size={14} /> ESP32: <span style={{ color: isEsp32Active ? '#22c55e' : '#ef4444', fontWeight: 'bold' }}>{isEsp32Active ? 'Active' : 'Offline'}</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle size={14} /> MAX30102: <span style={{ color: isEsp32Active && realtimeData.status === 'Measuring' ? '#22c55e' : '#d97706', fontWeight: 'bold' }}>{!isEsp32Active ? 'Offline' : realtimeData.status === 'Measuring' ? 'Measuring' : 'No finger'}</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Battery size={14} /> Battery: <span style={{ fontWeight: 'bold' }}>{isEsp32Active && realtimeData.battery_level != null ? `${realtimeData.battery_level}%${realtimeData.is_charging ? ' (charging)' : ''}` : 'N/A'}</span></div>
+                </div>
+              </div>
+              
+            </div>
+
+
+
+
+
+            {/* COLUMN 2 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+
+
+              {/* card 3: Advanced PPG Diagnostics */}
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <h4 style={{ margin: '0 0 10px 0',fontSize:'30px' }}>Advanced PPG Waveforms</h4>
+
+                <span style={{ fontSize: '20px', color: '#0a0a0a' }}>Real-time Heart Rate</span>
+                <div style={{ height: '250px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
+
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={annotationChartData} margin={{ top: 20, right: 15, left: 5, bottom: 5 }}>
+                    <LineChart data={data} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                       <XAxis
-                        dataKey="ts"
-                        type="number"
-                        scale="time"
-                        domain={annotationDomain}
-                        tickFormatter={(t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                        dataKey="time"
                         stroke="#64748b"
                         fontSize={10}
-                        tickCount={5}
+                        interval="preserveStartEnd"
+                        minTickGap={40}
+                        tickMargin={4}
                         height={38}
                         label={{ value: 'Time', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
                       />
@@ -448,127 +655,58 @@ export default function Cardiovascular() {
                         stroke="#64748b"
                         fontSize={10}
                         width={55}
-                        label={{ value: 'Heart Rate (BPM)', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
+                        tickFormatter={(v) => `${Math.round(v / 1000)}k`}
+                        label={{ value: 'IR Signal', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
                       />
                       <Tooltip
-                        labelFormatter={(t) => new Date(t).toLocaleTimeString()}
-                        contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#0c0c0c', borderRadius: '6px' }}
-                        itemStyle={{ color: '#0c0b0b', fontSize: '12px' }}
+                        contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#0a0a0a', borderRadius: '6px' }}
+                        itemStyle={{ color: '#0f0f0f', fontSize: '12px' }}
                       />
-                      <Line
-                        type="monotone"
-                        dataKey="hr"
-                        name="Heart Rate (BPM)"
-                        stroke="#252926"
-                        strokeWidth={2}
-                        dot={false}
-                        activeDot={{ r: 4 }}
-                        isAnimationActive={false}
-                      />
-                      {eventsData.map((ev, i) => (
-                        <ReferenceLine
-                          key={ev.id || i}
-                          x={new Date(ev.event_time).getTime()}
-                          stroke={getActivityColor(ev.activity_type)}
-                          strokeWidth={2}
-                          strokeDasharray="4 3"
-                          label={{ value: ev.activity_type, position: 'top', fontSize: '10px', fill: getActivityColor(ev.activity_type) }}
-                        />
-                      ))}
+                      <Line type="monotone" dataKey="ir" stroke="#252926" strokeWidth={2} dot={false} isAnimationActive={false} />
                     </LineChart>
                   </ResponsiveContainer>
-                ) : (
-                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#94a3b8', paddingTop: '80px' }}>
-                    No vitals data for {selectedDate}.
-                  </p>
-                )}
-              </div>
-            </div>
+                </div>
+
+
+                <span style={{ fontSize: '20px', color: '#0d0d0e' }}>Real-time Pulse Interval Dynamics</span>
+                <div style={{ height: '210px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
+
+                  <ResponsiveContainer width="100%" height="100%">
+
+                    <LineChart data={data} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis
+                        dataKey="time"
+                        stroke="#64748b"
+                        fontSize={10}
+                        interval="preserveStartEnd"
+                        minTickGap={40}
+                        tickMargin={4}
+                        height={38}
+                        label={{ value: 'Time', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
+                      />
+                      <YAxis
+                        domain={['auto', 'auto']}
+                        stroke="#64748b"
+                        fontSize={10}
+                        width={55}
+                        tickFormatter={(v) => Math.round(v)}
+                        label={{ value: 'Pulse Interval (ms)', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
+                      />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#0a0a0a', borderRadius: '6px' }}
+                        itemStyle={{ color: '#111010', fontSize: '12px' }}
+                        formatter={(v) => [`${v} ms`, 'Pulse Interval']}
+                      />
+                      <Line type="monotone" dataKey="pulse_interval" stroke="#252926" strokeWidth={2} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
 
 
 
-          </div>
 
-          {/* COLUMN 2 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-
-
-            {/* Module 2: Advanced PPG Diagnostics */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ margin: '0 0 10px 0' }}>Advanced PPG Waveforms</h4>
-
-              <span style={{ fontSize: '12px', color: '#64748b' }}>Real-time Heart Rate</span>
-              <div style={{ height: '170px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
-
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis
-                      dataKey="time"
-                      stroke="#64748b"
-                      fontSize={10}
-                      interval="preserveStartEnd"
-                      minTickGap={40}
-                      tickMargin={4}
-                      height={38}
-                      label={{ value: 'Time', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
-                    />
-                    <YAxis
-                      domain={['auto', 'auto']}
-                      stroke="#64748b"
-                      fontSize={10}
-                      width={55}
-                      tickFormatter={(v) => `${Math.round(v / 1000)}k`}
-                      label={{ value: 'IR Signal', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
-                    />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#0a0a0a', borderRadius: '6px' }}
-                      itemStyle={{ color: '#0f0f0f', fontSize: '12px' }}
-                    />
-                    <Line type="monotone" dataKey="ir" stroke="#252926" strokeWidth={2} dot={false} isAnimationActive={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-
-
-              <span style={{ fontSize: '12px', color: '#64748b' }}>Real-time Pulse Interval Dynamics</span>
-              <div style={{ height: '170px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
-
-                <ResponsiveContainer width="100%" height="100%">
-
-                  <LineChart data={data} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis
-                      dataKey="time"
-                      stroke="#64748b"
-                      fontSize={10}
-                      interval="preserveStartEnd"
-                      minTickGap={40}
-                      tickMargin={4}
-                      height={38}
-                      label={{ value: 'Time', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
-                    />
-                    <YAxis
-                      domain={['auto', 'auto']}
-                      stroke="#64748b"
-                      fontSize={10}
-                      width={55}
-                      tickFormatter={(v) => Math.round(v)}
-                      label={{ value: 'Pulse Interval (ms)', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
-                    />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#0a0a0a', borderRadius: '6px' }}
-                      itemStyle={{ color: '#111010', fontSize: '12px' }}
-                      formatter={(v) => [`${v} ms`, 'Pulse Interval']}
-                    />
-                    <Line type="monotone" dataKey="pulse_interval" stroke="#252926" strokeWidth={2} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-
-
-              {/*
+                {/*
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Recent Vital Logs</span>
                 <span style={{ fontSize: '10px', color: '#64748b' }}>Live Data Feed</span>
@@ -594,133 +732,137 @@ export default function Cardiovascular() {
                 </tbody>
               </table>
               */}
+              </div>
+
+      
+
             </div>
 
-            {/* Module 5: Device Health & Management */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ margin: '0 0 10px 0' }}>Device Health</h4>
-              <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', fontSize: '14px' }}>Device & Sensor Diagnostics</p>
+            {/* </div>*/}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Cpu size={14} /> ESP32: <span style={{ color: isEsp32Active ? '#22c55e' : '#ef4444', fontWeight: 'bold' }}>{isEsp32Active ? 'Active' : 'Offline'}</span></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle size={14} /> MAX30102: <span style={{ color: isEsp32Active && realtimeData.status === 'Measuring' ? '#22c55e' : '#d97706', fontWeight: 'bold' }}>{!isEsp32Active ? 'Offline' : realtimeData.status === 'Measuring' ? 'Measuring' : 'No finger'}</span></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Battery size={14} /> Battery: <span style={{ fontWeight: 'bold' }}>{isEsp32Active && realtimeData.battery_level != null ? `${realtimeData.battery_level}%${realtimeData.is_charging ? ' (charging)' : ''}` : 'N/A'}</span></div>
-              </div>
-            </div>
+            {/* COLUMN 3 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-          </div>
+              {/* Module 3: Historical Vitals Trends */}
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize:'30px' }}>Historical Vitals Trends</h4>
+                <span style={{ fontSize: '20px', fontWeight: 'bold' }}>Recent Vitals Trend ({timeframe.toUpperCase()})</span>
 
-          {/* COLUMN 3 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-            {/* Module 3: Historical Vitals Trends */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ margin: '0 0 10px 0' }}>Historical Vitals Trends</h4>
-              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Recent Vitals Trend ({timeframe.toUpperCase()})</span>
-
-              <div style={{ height: '200px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
-                {longTermData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={longTermData} margin={{ top: 10, right: 10, left: 5, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis
-                        dataKey="name"
-                        stroke="#64748b"
-                        fontSize={10}
-                        interval="preserveStartEnd"
-                        minTickGap={30}
-                        tickMargin={4}
-                        height={38}
-                        label={{ value: timeframe === 'daily' ? 'Time (hourly avg)' : 'Date (daily avg)', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
-                      />
-                      <YAxis
-                        domain={['auto', 'auto']}
-                        stroke="#64748b"
-                        fontSize={10}
-                        width={55}
-                        label={{ value: 'Average Value', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
-                      />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#070707', borderRadius: '6px' }}
-                        itemStyle={{ color: '#0f0f0f', fontSize: '12px' }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px', paddingTop: 10 }} />
-                      <Line type="natural" dataKey="hr" name="Heart Rate (BPM)" stroke="#ef4444" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
-                      <Line type="natural" dataKey="sys" name="Systolic BP" stroke="#2563eb" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
-                      <Line type="natural" dataKey="dia" name="Diastolic BP" stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#94a3b8', paddingTop: '60px' }}>No data for selected timeframe.</p>
-                )}
-              </div>
-
-              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Vitals Summary Range</span>
-                  <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)} style={{ fontSize: '10px', padding: '2px 4px' }}>
-                    <option value="daily">Daily</option>
-                    <option value="monthly">Monthly</option>
-                  </select>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '10px', fontSize: '11px' }}>
-                  <div>
-                    <span style={{ color: '#64748b' }}>Heart Rate</span>
-                    <p style={{ margin: 0, fontWeight: 'bold', color: '#ef4444' }}>{summaryStats.hrRange} bpm</p>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>Blood Pressure</span>
-                    <p style={{ margin: 0, fontWeight: 'bold', color: '#2563eb' }}>{summaryStats.bpRange} mmHg</p>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>Pulse Interval</span>
-                    <p style={{ margin: 0, fontWeight: 'bold' }}>{summaryStats.piRange}</p>
-                  </div>
-                </div>
-
-                <p style={{ fontSize: '11px', margin: '10px 0 0 0', color: '#64748b' }}>
-                  Status: <strong>{summaryStats.status}</strong>
-                </p>
-              </div>
-            </div>
-
-            {/* Database Records Block */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>Database Records ({timeframe.toUpperCase()})</span>
-                <span style={{ fontSize: '11px', color: '#0e7490' }}>Total: {recentLogs.length} Records</span>
-              </div>
-
-              <table style={{ width: '100%', fontSize: '11px', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>
-                    <th>Time / Date</th><th>HR</th><th>BP</th><th>Pulse Int</th><th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentLogs.length === 0 ? (
-                    <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>No records found for selected timeframe.</td></tr>
+                <div style={{ height: '360px', backgroundColor: '#f8fafc', borderRadius: '6px', marginTop: '5px', border: '1px solid #e2e8f0', marginBottom: '15px' }}>
+                  {longTermData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={longTermData} margin={{ top: 10, right: 10, left: 5, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis
+                          dataKey="name"
+                          stroke="#64748b"
+                          fontSize={10}
+                          interval="preserveStartEnd"
+                          minTickGap={30}
+                          tickMargin={4}
+                          height={38}
+                          label={{ value: timeframe === 'daily' ? 'Time (hourly avg)' : 'Date (daily avg)', position: 'insideBottom', offset: -2, fontSize: '11px', fill: '#64748b' }}
+                        />
+                        <YAxis
+                          domain={['auto', 'auto']}
+                          stroke="#64748b"
+                          fontSize={10}
+                          width={55}
+                          label={{ value: 'Average Value', angle: -90, position: 'insideLeft', offset: 5, fontSize: '11px', fill: '#64748b', style: { textAnchor: 'middle' } }}
+                        />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#ced5e7', borderColor: '#dae3f0', color: '#070707', borderRadius: '6px' }}
+                          itemStyle={{ color: '#0f0f0f', fontSize: '12px' }}
+                        />
+                        <Legend wrapperStyle={{ fontSize: '10px', paddingTop: 10 }} />
+                        <Line type="natural" dataKey="hr" name="Heart Rate (BPM)" stroke="#ef4444" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
+                        <Line type="natural" dataKey="sys" name="Systolic BP" stroke="#2563eb" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
+                        <Line type="natural" dataKey="dia" name="Diastolic BP" stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
+                      </LineChart>
+                    </ResponsiveContainer>
                   ) : (
-                    recentLogs.slice(0, 5).map((log, index) => (
-                      <tr key={index}>
-                        <td>{new Date(log.created_at).toLocaleTimeString()}</td>
-                        <td>{log.heart_rate}</td>
-                        <td>{log.systolic_bp}/{log.diastolic_bp}</td>
-                        <td>{log.pulse_interval}</td>
-                        <td>{log.patient_status}</td>
-                      </tr>
-                    ))
+                    <p style={{ textAlign: 'center', fontSize: '20px', color: '#94a3b8', paddingTop: '60px' }}>No data for selected timeframe.</p>
                   )}
-                </tbody>
-              </table>
+                </div>
+
+                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '20px', fontWeight: 'bold' }}>Vitals Summary Range</span>
+                    <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)} style={{ fontSize: '20px', padding: '2px 4px' }}>
+                      <option value="daily">Daily</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '10px', fontSize: '20px' }}>
+                    <div>
+                      <span style={{ color: '#0d0d0e', fontWeight:'500' }}>Heart Rate</span>
+                      <p style={{ margin: 0, fontWeight: 'bold', color: '#ef4444' }}>{summaryStats.hrRange} bpm</p>
+                    </div>
+                    <div>
+                      <span style={{ color: '#0d0d0e', fontWeight:'500'}}>Blood Pressure</span>
+                      <p style={{ margin: 0, fontWeight: 'bold', color: '#2563eb' }}>{summaryStats.bpRange} mmHg</p>
+                    </div>
+                    <div>
+                      <span style={{ color: '#0d0d0e', fontWeight:'500' }}>Pulse Interval</span>
+                      <p style={{ margin: 0, fontWeight: 'bold' }}>{summaryStats.piRange}</p>
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: '15px', margin: '10px 0 0 0', color: '#64748b' }}>
+                    Status: <strong>{summaryStats.status}</strong>
+                  </p>
+                </div>
+              </div>
+
+              
+
+
+
             </div>
 
-          </div>
 
+
+
+
+            
+          </div>
         </div>
+
+
+        {/* Database Records Block */}
+              <div className="cardio-card" style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', flex: 1, marginTop:'20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '20px', fontWeight: 'bold' }}>Database Records ({timeframe.toUpperCase()})</span>
+                  <span style={{ fontSize: '15px', color: '#061114' }}>Total: {recentLogs.length} Records</span>
+                </div>
+
+                <table style={{ width: '100%', fontSize: '11px', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ color: '#0a0a0a', borderBottom: '1px solid #e2e8f0', fontSize:'15px' }}>
+                      <th>Time / Date</th><th>HR</th><th>BP</th><th>Pulse Int</th><th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentLogs.length === 0 ? (
+                      <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8',fontSize:'17px' }}>No records found for selected timeframe.</td></tr>
+                    ) : (
+                      recentLogs.slice(0, 5).map((log, index) => (
+                        <tr key={index}>
+                          <td>{new Date(log.created_at).toLocaleTimeString()}</td>
+                          <td>{log.heart_rate}</td>
+                          <td>{log.systolic_bp}/{log.diastolic_bp}</td>
+                          <td>{log.pulse_interval}</td>
+                          <td>{log.patient_status}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
       </div>
     </div>
+
   );
 }
 
