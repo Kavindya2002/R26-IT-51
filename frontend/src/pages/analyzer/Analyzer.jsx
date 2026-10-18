@@ -758,7 +758,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   // /latest every 100 ms → posture decision + sliding window + /predict
   useEffect(() => {
     let cancelled = false;
-{/*call to the engine*/}
+{/*call to the engine - tick() runs every 100 ms It reads the newest sample from /latest*/}
     async function tick() {
       try {
         const data = await fallApi.latest();
@@ -783,7 +783,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         }
         setDeviceLive(Date.now() - lastChangeRef.current < 2500);
         setSensor(data);
-
+{/*sends the sample and the latest prediction to the engine*/}
         const d = engineRef.current.update(data, predictionRef.current, { now: Date.now(), isNew });
         setDecision(d);
         if (d.level !== lastLevelRef.current) {
