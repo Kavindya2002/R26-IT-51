@@ -523,7 +523,7 @@ function RowLabel({ children, sub }) {
   );
 }
 
-// Live line chart - 8-second graph and dashline in section 3: dashline function create
+// Live line chart - Mini chart
 const TRACE_LEN = 80; // 80 samples @ 10 Hz = 8 seconds
 function Spark({ data, color, min, max, height = 44, baseline, area = false }) {
   const w = 200;
@@ -1338,6 +1338,10 @@ function LiveDashboard({ wearerName, onEndSession }) {
         </div>
 
         {/* ───────── LAST ROW : sensor data | prediction history | posture event log ───────── */}
+
+         {/* ─────────--------------------------------------------sensor data-------------------------------------------------------------───────── */}
+
+        
         <RowLabel sub="Sections 6 – 8">Raw data &amp; logs</RowLabel>
         <div className="grid lg:grid-cols-3 gap-8">
           <Panel title="Sensor Data" icon={Crosshair} num={6} delay={0.05}>
@@ -1362,8 +1366,9 @@ function LiveDashboard({ wearerName, onEndSession }) {
                         {(sensor[k] ?? 0).toFixed(2)}
                       </p>
                     </div>
+                    {/*call to min card*/}
                     <div className="mt-2">
-                      <Spark data={series} color={color} min={lo} max={hi} height={38} baseline={0} />
+                      <Spark data={series} color={color} min={lo} max={hi} height={38} baseline={0} />  
                     </div>
                   </div>
                 );

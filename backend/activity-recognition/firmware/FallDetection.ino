@@ -105,7 +105,7 @@ void loop() {
   client.loop();
 
   bmi160.getAccelGyroData(rawData);
-
+//Reading the raw data from the BMI160 sensor and storing it in the rawData array
   // Remove offsets & scale
   float ax = (rawData[3] - ax_off) / 16384.0f;   // g
   float ay = (rawData[4] - ay_off) / 16384.0f;

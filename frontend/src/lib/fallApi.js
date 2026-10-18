@@ -32,6 +32,7 @@ export const fallApi = {
   reset: () => postJSON("/reset")
 };
 
+{/*Poll rate constants*/}
 export const WINDOW_SIZE = 20; // must match server.py / train.py
 export const PRED_EVERY = 10; // run a new prediction every N samples
 export const POLL_INTERVAL_MS = 100; // matches the 10Hz publish rate
