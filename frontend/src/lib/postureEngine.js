@@ -95,7 +95,7 @@ export function orientation(imu) {
   return { pitchRad: pitch, rollRad: roll, pitchDeg: pitch * RAD2DEG, rollDeg: roll * RAD2DEG };
 }
 
-// tilt = angle from vertical (device vertical axis is `ay`, ay ≈ +1 g standing)
+// calculate tilt and direction
 export function readPosture(imu) {
   const ax = imu?.ax ?? 0,
     ay = imu?.ay ?? 1,
@@ -241,7 +241,7 @@ export function createPostureEngine(L = DEFAULT_LOGIC) {
     else if (p.tilt >= L.slightTilt) level = 1;
     else level = 0;
 
-    // ---- text ----
+    // ---- text - why message ----
     const t = p.tilt.toFixed(0);
     const act =
       prediction?.context?.previous_activity && prediction.context.previous_activity !== "unknown"
