@@ -967,7 +967,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         </div>
       </div>
 
-      {/* Server-offline help */}
+      {/* Server-offline h*/}
       {serverStatus === "offline" && (
         <div className="bg-[#FFF3D6] border-b border-[#F2D58A]">
           <div className="container-xl py-3 flex items-center gap-3 text-base font-medium text-[#6B4300]">
