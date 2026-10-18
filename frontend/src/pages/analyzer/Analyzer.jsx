@@ -818,7 +818,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addEvent]);
-
+{/*reset function*/}
   async function handleReset() {
     try {
       await fallApi.reset(); // clears the server-side fall engine
@@ -1020,7 +1020,10 @@ function LiveDashboard({ wearerName, onEndSession }) {
       </AnimatePresence>
 
       <div className="container-xl mt-8 space-y-10">
-        {/* ───────── ROW 1 : posture decision | body orientation + movement ───────── */}
+
+        {/* ───────── ROW 1  ───────── */}
+
+        {/* ───────── posture decision | body orientation + movement ───────── */}
         <RowLabel sub="Sections 1 – 3">Live decision</RowLabel>
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Posture Decision */}
