@@ -522,7 +522,7 @@ function RowLabel({ children, sub }) {
   );
 }
 
-// Live line chart. Newest sample is on the right; older samples scroll left.
+// Live line chart - 8-second graph and dashline in section 3: dashline function create
 const TRACE_LEN = 80; // 80 samples @ 10 Hz = 8 seconds
 function Spark({ data, color, min, max, height = 44, baseline, area = false }) {
   const w = 200;
@@ -673,7 +673,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   const [serverStatus, setServerStatus] = useState("connecting"); // connecting | ok | offline
   const [deviceLive, setDeviceLive] = useState(false);  // true if /latest is returning new MQTT messages
   const [classes, setClasses] = useState([]);
-  const [sensor, setSensor] = useState({ ax: 0, ay: 1, az: 0, gx: 0, gy: 0, gz: 0, mag: 1 });
+  const [sensor, setSensor] = useState({ ax: 0, ay: 1, az: 0, gx: 0, gy: 0, gz: 0, mag: 1 }); // latest reading
   const [trace, setTrace] = useState([]); // last 8 s of samples (for the live charts)
   const [samples, setSamples] = useState(0);
   const [predTotal, setPredTotal] = useState(0);
@@ -833,7 +833,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
 
   // ---- derived values ----
   const { pitchDeg, rollDeg } = orientation(sensor);  //Pitch and Roll calculation
-  const sway = Math.abs(sensor.gx || 0) + Math.abs(sensor.gy || 0);
+  const sway = Math.abs(sensor.gx || 0) + Math.abs(sensor.gy || 0);  //Stability score calculation
   const stabilityScore = Math.max(0, Math.round(100 - Math.min(sway * 1.5, 100)));
   const isFall = decision.level === 5; // FALL CONFIRMED
   const isPotential = decision.level === 4; // POTENTIAL FALL
@@ -861,7 +861,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
     { name: "Fall Engine", sub: "risk + confirmation", icon: Activity, on: serverOk && !!ctx, color: "#2BE08A" },
     { name: "Posture Decision", sub: `level ${decision.level} of 5`, icon: ShieldAlert, on: deviceLive, color: decision.hex }
   ];
-
+{/*Graph data*/}
   const magData = trace.map((s) => s.mag ?? 1);
 
   return (
@@ -1171,9 +1171,10 @@ function LiveDashboard({ wearerName, onEndSession }) {
               <div className="grid sm:grid-cols-[auto_1fr] gap-x-8 gap-y-5 items-center">
                 <div>
                   <p className="font-mono text-5xl font-bold text-ink">{(sensor.mag || 0).toFixed(2)}</p>
-                  <p className="text-base text-slate mt-1">acceleration (g) · dashed line = 1 g</p>
+                  <p className="text-base text-slate mt-1">acceleration (g) : dashed line = 1 g</p>
                 </div>
                 <div className="rounded-2xl bg-mist border border-[#E1EAF2] p-3">
+                  {/*dashline function use*/}
                   <Spark data={magData} color="#1769E0" min={0} max={2} height={84} baseline={1} area />
                   <p className="mt-1 flex justify-between text-sm text-slate font-mono">
                     <span>← 8 s ago</span>
@@ -1181,7 +1182,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
                   </p>
                 </div>
               </div>
-
+{/*Stability text, number and green bar*/}
               <div className="mt-6 pt-5 border-t border-[#E1EAF2]">
                 <div className="flex items-end justify-between gap-3">
                   <div>

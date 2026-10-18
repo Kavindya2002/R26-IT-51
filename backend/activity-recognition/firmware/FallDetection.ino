@@ -127,7 +127,7 @@ void loop() {
     fgy = ALPHA*gy + (1-ALPHA)*fgy;
     fgz = ALPHA*gz + (1-ALPHA)*fgz;
   }
-
+// first calculate the mag value
   float mag = sqrt(fax*fax + fay*fay + faz*faz);
 
   // ================= JSON PAYLOAD =================
