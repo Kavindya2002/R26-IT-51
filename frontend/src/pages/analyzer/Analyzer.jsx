@@ -679,7 +679,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   const [samples, setSamples] = useState(0);
   const [predTotal, setPredTotal] = useState(0);
   const [prediction, setPrediction] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([]);     //history table
   const [decision, setDecision] = useState({   //Starting values before data arrives
     level: 0,
     title: "UPRIGHT",
@@ -699,7 +699,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
       confirming: false
     }
   });
-  const [eventLog, setEventLog] = useState([]);
+  const [eventLog, setEventLog] = useState([]); // section 8
 
   const bufferRef = useRef([]);
   const sampleCountRef = useRef(0);
@@ -736,7 +736,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
     const time = new Date().toLocaleTimeString("en-GB");
     setEventLog((prev) => [{ time, title, level, tilt: tilt.toFixed(0) }, ...prev.slice(0, 19)]);
   }, []);
-
+{/*when new entry added*/}
   async function runPrediction() {
     if (predInFlightRef.current || bufferRef.current.length < WINDOW_SIZE) return;
     predInFlightRef.current = true;
@@ -811,7 +811,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         // network hiccup - keep polling silently
       }
     }
-
+{/*When a prediction is requested*/}
     const id = setInterval(tick, POLL_INTERVAL_MS);
     return () => {
       cancelled = true;
@@ -1337,7 +1337,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
           </Panel>
         </div>
 
-        {/* ───────── LAST ROW : sensor data | prediction history | posture event log ───────── */}
+        {/* ───────── LAST ROW ───────── */}
 
          {/* ─────────--------------------------------------------sensor data-------------------------------------------------------------───────── */}
 
@@ -1378,7 +1378,8 @@ function LiveDashboard({ wearerName, onEndSession }) {
               a = acceleration (g) · g = rotation speed (°/s) · last 8 s
             </p>
           </Panel>
-
+          {/*-------------------------------------------------------Prediction History------------------------------------------------  */}
+          
           <Panel title="Prediction History" icon={History} num={7} delay={0.1}>
             <div className="max-h-[26rem] overflow-y-auto pr-1">
               {history.length === 0 && <p className="text-lg text-slate">No predictions yet.</p>}
@@ -1401,7 +1402,8 @@ function LiveDashboard({ wearerName, onEndSession }) {
               ))}
             </div>
           </Panel>
-
+          {/*-------------------------------------------------------Posture Event Log------------------------------------------------  */}
+          
           <Panel title="Posture Event Log" icon={AudioWaveform} num={8} delay={0.15}>
             <div className="max-h-[26rem] overflow-y-auto pr-1">
               {eventLog.length === 0 && <p className="text-lg text-slate">No events yet.</p>}
