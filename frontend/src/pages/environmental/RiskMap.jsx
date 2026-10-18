@@ -57,7 +57,7 @@ export default function RiskMap({ zones, devices }) {
         const { hex } = riskOf(zone.risk_level);
         const x1 = cx - W / 2, x2 = cx + W / 2, y1 = cy - D / 2, y2 = cy + D / 2;
         const zoneDevices = devices.filter((d) => d.zone_id === zone.zone_id);
-        const label = project(cx, cy, H + 0.45);
+        const label = project(cx, cy, H + 0.45); 
 
         return (
           <g key={zone.zone_id}>

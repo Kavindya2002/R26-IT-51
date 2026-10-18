@@ -115,14 +115,14 @@ python server.py`}</pre>
 
         {backendOnline && sum && (
           <>
-            <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-              <Stat label="Devices" value={sum.devices} />
-              <Stat label="Connected" value={sum.online} tone="text-emerald-600" />
-              <Stat label="Disconnected" value={sum.offline} tone={sum.offline ? "text-red-600" : "text-ink"} />
-              <Stat label="Sensor nodes" value={sum.sensor_nodes} />
-              <Stat label="Cameras" value={sum.cameras} />
-              <Stat label="High-risk zones" value={sum.high_risk_zones} tone={sum.high_risk_zones ? "text-red-600" : "text-ink"} />
-            </div>
+            <div className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-6">
+  <Stat label="Devices" value={sum.devices} />
+  <Stat label="Connected" value={sum.online} tone="text-emerald-600" />
+  <Stat label="Disconnected" value={sum.offline} tone={sum.offline ? "text-red-600" : "text-ink"} />
+  <Stat label="Sensor nodes" value={sum.sensor_nodes} />
+  <Stat label="Cameras" value={sum.cameras} />
+  <Stat label="High-risk zones" value={sum.high_risk_zones} tone={sum.high_risk_zones ? "text-red-600" : "text-ink"} />
+</div>
 
             {/* ── Zone summary ── */}
             <Section icon={ShieldAlert} title="Zone risk summary">
