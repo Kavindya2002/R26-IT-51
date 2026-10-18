@@ -1023,7 +1023,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
 
         {/* ───────── ROW 1  ───────── */}
 
-        {/* ───────── posture decision   + movement ───────── */}
+        {/* ───────── ------------------------------------------posture decision-----------------------------------------  ───────── */}
         <RowLabel sub="Sections 1 – 3">Live decision</RowLabel>
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Posture Decision */}
@@ -1122,7 +1122,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
             </div>
           </Panel>
 
-          {/* Body Orientation  */}
+          {/* ---------------------------------------------------------Body Orientation------------------------------------------------  */}
 
           <div className="lg:col-span-6 flex flex-col gap-8">
             <Panel title="Body Orientation" icon={Compass} num={2} delay={0.08} className="flex-1">
@@ -1165,7 +1165,8 @@ function LiveDashboard({ wearerName, onEndSession }) {
                 </div>
               </div>
             </Panel>
-
+{/* -------------------------------------------------------Movement Magnitude----------------------------------------------- */}
+            
             <Panel title="Movement Magnitude" icon={Gauge} num={3} delay={0.16}>
               <div className="grid sm:grid-cols-[auto_1fr] gap-x-8 gap-y-5 items-center">
                 <div>
