@@ -61,6 +61,8 @@ const CLASS_TEXT = {
 {/*levels colours - posture decision*/}
 const LEVEL_TEXT = ["#007A48", "#0F5FB0", "#6B2FD6", "#B34700", "#C81E1E", "#A30000"];
 
+{/*Event names and colours - Context Awareness*/}
+
 const EVENT_STYLE = {
   normal: { text: "Normal", color: "#007A48" },
   leaning: { text: "Leaning", color: "#0F5FB0" },
@@ -79,7 +81,7 @@ function labelText(label) {
   return label.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// ───────────────────────── NAME GATE ─────────────────────────
+
 // ───────────────────────── NAME GATE ─────────────────────────
 function getInitials(name) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -1249,11 +1251,16 @@ function LiveDashboard({ wearerName, onEndSession }) {
             </div>
           </Panel>
 
+          {/* -------------------------------------------------------Context Awareness----------------------------------------------- */}
+
           <Panel title="Context Awareness" icon={ListChecks} num={5} className="lg:col-span-7" delay={0.1}>
             {ctx ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-mist rounded-2xl px-4 py-3.5 border border-[#E1EAF2]">
+
+                    {/*Server check*/}
+
                     <p className="text-sm font-semibold text-slate uppercase tracking-wide">
                       Server check
                     </p>
@@ -1268,6 +1275,9 @@ function LiveDashboard({ wearerName, onEndSession }) {
                       <p className="mt-1 text-xl font-bold text-ink">—</p>
                     )}
                   </div>
+
+                  {/*Previous activity, Direction, State tiles*/}
+
                   <Tile label="Previous activity" value={labelText(ctx.previous_activity)} />
                   <Tile label="Direction" value={ctx.direction ? labelText(ctx.direction) : "—"} />
                   <Tile label="State" value={labelText(ctx.state)} />
@@ -1308,6 +1318,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
                   <p className="text-lg text-ink leading-relaxed bg-mist rounded-2xl p-4 border border-[#E1EAF2]">
                     {prediction.human_message}
                   </p>
+                  {/*Waiting for enough sensor data…*/}
                   {ctx.trigger_factors?.length > 0 && (
                     <ul className="mt-3 space-y-1.5">
                       {ctx.trigger_factors.map((f, i) => (
