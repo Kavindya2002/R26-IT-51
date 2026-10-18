@@ -36,9 +36,8 @@ import Avatar3D from "../../components/Avatar3D.jsx";
 // They are NOT shown to the user - change them in that file if needed.
 const L = DEFAULT_LOGIC;
 
-// ── Colours (all chosen to be easy to read on white cards) ─────────────
-// Warning colours are violet / orange / red.  Yellow is NOT used for any
-// posture state, so it can never be confused with "walking".
+// class color
+
 const CLASS_BAR = {
   forward_fall: "#FF5A5F",
   backward_fall: "#FF5A5F",
@@ -558,7 +557,7 @@ function Spark({ data, color, min, max, height = 44, baseline, area = false }) {
   );
 }
 
-// Circular progress (used for model confidence)
+// confidence ring
 function Ring({ value, color, size = 104 }) {
   const r = 42;
   const c = 2 * Math.PI * r;
@@ -672,7 +671,7 @@ function PipelineStrip({ steps }) {
 function LiveDashboard({ wearerName, onEndSession }) {
   const [serverStatus, setServerStatus] = useState("connecting"); // connecting | ok | offline
   const [deviceLive, setDeviceLive] = useState(false);  // true if /latest is returning new MQTT messages
-  const [classes, setClasses] = useState([]);
+  const [classes, setClasses] = useState([]); //class list
   const [sensor, setSensor] = useState({ ax: 0, ay: 1, az: 0, gx: 0, gy: 0, gz: 0, mag: 1 }); // latest reading
   const [trace, setTrace] = useState([]); // last 8 s of samples (for the live charts)
   const [samples, setSamples] = useState(0);
@@ -1205,7 +1204,9 @@ function LiveDashboard({ wearerName, onEndSession }) {
           </div>
         </div>
 
-        {/* ───────── ROW 2 : live prediction | context awareness ───────── */}
+        {/* ───────── ROW 2  ───────── */}
+
+        {/* ───────── ------------------------------------------- live prediction ------------------------------------ ───────── */}
         <RowLabel sub="Sections 4 – 5">Analysis</RowLabel>
         <div className="grid lg:grid-cols-12 gap-8">
           <Panel title="Live Prediction" icon={Activity} num={4} className="lg:col-span-5" delay={0.05}>
