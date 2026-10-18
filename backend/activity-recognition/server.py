@@ -31,7 +31,7 @@ FEATURES = [
     "gz",
     "mag"
 ]
-
+# 60% rule
 CONFIDENCE_THRESHOLD = 0.60
 
 # =========================================================
@@ -238,7 +238,7 @@ def reset_engine():
 # =========================================================
 # PREDICT
 # =========================================================
-
+#Server endpoint
 @app.route("/predict", methods=["POST"])
 def predict():
 
@@ -349,7 +349,7 @@ def predict():
         # =================================================
         # LOW CONFIDENCE FILTER
         # =================================================
-
+# 60% rule
         if confidence < CONFIDENCE_THRESHOLD:
 
             pred_label = "uncertain"
