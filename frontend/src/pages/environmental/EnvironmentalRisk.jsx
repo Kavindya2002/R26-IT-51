@@ -16,6 +16,8 @@ import { riskOf } from "./riskStyle.js";
 //  Backend: backend/environmental-risk/server.py   (port 5051)
 //  Backend URL is read from .env → VITE_ENV_RISK_API_URL
 // ─────────────────────────────────────────────────────────────
+
+{/*api url*/}
 export const API_URL = ENV_API_URL;
 
 function Stat({ label, value, tone = "text-ink" }) {
