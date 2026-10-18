@@ -758,7 +758,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   // /latest every 100 ms → posture decision + sliding window + /predict
   useEffect(() => {
     let cancelled = false;
-{/*call to the engine*/}
+{/*call to the engine - tick() runs every 100 ms It reads the newest sample from /latest*/}
     async function tick() {
       try {
         const data = await fallApi.latest();
@@ -783,7 +783,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         }
         setDeviceLive(Date.now() - lastChangeRef.current < 2500);
         setSensor(data);
-
+{/*sends the sample and the latest prediction to the engine*/}
         const d = engineRef.current.update(data, predictionRef.current, { now: Date.now(), isNew });
         setDecision(d);
         if (d.level !== lastLevelRef.current) {
@@ -818,7 +818,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addEvent]);
-
+{/*reset function*/}
   async function handleReset() {
     try {
       await fallApi.reset(); // clears the server-side fall engine
@@ -1020,7 +1020,10 @@ function LiveDashboard({ wearerName, onEndSession }) {
       </AnimatePresence>
 
       <div className="container-xl mt-8 space-y-10">
-        {/* ───────── ROW 1 : posture decision | body orientation + movement ───────── */}
+
+        {/* ───────── ROW 1  ───────── */}
+
+        {/* ───────── posture decision | body orientation + movement ───────── */}
         <RowLabel sub="Sections 1 – 3">Live decision</RowLabel>
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Posture Decision */}
