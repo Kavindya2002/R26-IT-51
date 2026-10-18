@@ -83,7 +83,7 @@ export function prettyLabel(label) {
   return String(label).replace(/_/g, " ");
 }
 
-// Pitch / roll in degrees for the HUD and the avatar.
+// Formulas for pitch and roll
 //   pitch > 0 → leaning forward,  pitch < 0 → backward
 //   roll  > 0 → leaning right,    roll  < 0 → left
 export function orientation(imu) {

@@ -832,7 +832,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   }
 
   // ---- derived values ----
-  const { pitchDeg, rollDeg } = orientation(sensor);
+  const { pitchDeg, rollDeg } = orientation(sensor);  //Pitch and Roll calculation
   const sway = Math.abs(sensor.gx || 0) + Math.abs(sensor.gy || 0);
   const stabilityScore = Math.max(0, Math.round(100 - Math.min(sway * 1.5, 100)));
   const isFall = decision.level === 5; // FALL CONFIRMED
@@ -1023,7 +1023,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
 
         {/* ───────── ROW 1  ───────── */}
 
-        {/* ───────── posture decision | body orientation + movement ───────── */}
+        {/* ───────── posture decision   + movement ───────── */}
         <RowLabel sub="Sections 1 – 3">Live decision</RowLabel>
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Posture Decision */}
@@ -1122,7 +1122,8 @@ function LiveDashboard({ wearerName, onEndSession }) {
             </div>
           </Panel>
 
-          {/* right column: big Body Orientation + Movement Magnitude */}
+          {/* Body Orientation  */}
+
           <div className="lg:col-span-6 flex flex-col gap-8">
             <Panel title="Body Orientation" icon={Compass} num={2} delay={0.08} className="flex-1">
               <div className="grid grid-cols-3 gap-3 mb-4">
@@ -1130,7 +1131,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
                 <Tile label="Roll" value={`${rollDeg.toFixed(1)}°`} mono />
                 <Tile label="Direction" value={decision.dir && decision.dir !== "none" ? labelText(decision.dir.replace("-", " ")) : "—"} />
               </div>
-
+{/*black 3D screen and HUD*/}
               <div
                 className="relative rounded-2xl overflow-hidden bg-[#080c10] flex-1 min-h-[460px] lg:min-h-[540px] border-4 transition-colors"
                 style={{ borderColor: isFall ? "#FF3B3B" : "#0B1F33" }}
