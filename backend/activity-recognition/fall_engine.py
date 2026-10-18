@@ -38,7 +38,7 @@ import numpy as np
 
 
 # =========================================================
-# 1. TUNABLE THRESHOLDS
+# 1. TUNABLE THRESHOLDS - Rule numbers
 #    
 # =========================================================
 
@@ -95,7 +95,7 @@ def is_fall_label(label):
 
 
 # =========================================================
-# 2. ORIENTATION HELPERS
+# 2. ORIENTATION HELPERS - Tilt and direction maths
 # =========================================================
 
 def compute_orientation(ax, ay, az):
@@ -177,7 +177,7 @@ def extract_physical_signals(df_window):
 
 
 # =========================================================
-# 4. PROACTIVE FALL-RISK SCORE  (novelty: predicts risk BEFORE a fall)
+# 4. PROACTIVE FALL-RISK SCORE  (novelty: predicts risk BEFORE a fall) - Risk score
 # =========================================================
 
 def compute_risk_score(signals, ml_probabilities):
@@ -244,7 +244,7 @@ class FallEngine:
         self.risk_history = deque(maxlen=60)  # ~1 minute of history at 1/s
         self.activity_history = deque(maxlen=10)
 
-    # -----------------------------------------------------
+    # ----------------------------------------------------- state machine
     def update(self, ml_label, ml_confidence, probabilities, df_window):
         signals = extract_physical_signals(df_window)
         if ml_label in HORIZONTAL_OK_LABELS:
@@ -276,6 +276,7 @@ class FallEngine:
         trigger_factors = []
 
         # ---------------- STATE MACHINE ----------------
+        #--------------------------------------------------monitoring----------------------
         if self.state == self.MONITORING:
             if ml_says_fall and physically_plausible_impact:
                 self.state = self.PENDING
@@ -303,7 +304,7 @@ class FallEngine:
                 )
             else:
                 event = "normal"
-
+#--------------------------------------------------pending----------------------
         elif self.state == self.PENDING:
             self.pending_cycles += 1
             if is_still and looks_fallen:
@@ -333,7 +334,7 @@ class FallEngine:
                 )
             else:
                 event = "confirming"
-
+#--------------------------------------------------confirmed----------------------
         elif self.state == self.CONFIRMED:
             event = "confirmed_fall"
             confirmed_direction = self.pending_direction
