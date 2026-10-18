@@ -59,7 +59,7 @@ const CLASS_TEXT = {
   standing_still: "#0B6E7B",
   uncertain: "#4A5B6C"
 };
-// one text colour per posture level (0 upright … 5 fall confirmed)
+{/*levels colours - posture decision*/}
 const LEVEL_TEXT = ["#007A48", "#0F5FB0", "#6B2FD6", "#B34700", "#C81E1E", "#A30000"];
 
 const EVENT_STYLE = {
@@ -419,10 +419,10 @@ function NameGate({ onStart }) {
 }
 
 // ───────────────────────── SMALL PIECES ─────────────────────────
-// Card with a soft entrance animation. `pulse` (a colour) makes the border glow.
-// Card with entrance animation, coloured accent bar, number badge and hover lift.
-// `accent` = this section's colour, `num` = section number (1-8),
-// `pulse` (a colour) makes the border glow (used for fall alerts).
+
+
+{/*panel function*/}
+
 function Panel({ title, icon: Icon, children, className = "", style, delay = 0, pulse, num, accent = "#1769E0" }) {
   return (
     <motion.section
@@ -492,7 +492,7 @@ function Panel({ title, icon: Icon, children, className = "", style, delay = 0, 
     </motion.section>
   );
 }
-
+{/*design of badges function*/}
 function StatusChip({ color, children }) {
   return (
     <span className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-base font-semibold text-white">
@@ -501,7 +501,7 @@ function StatusChip({ color, children }) {
     </span>
   );
 }
-
+{/*tile function*/}
 function Tile({ label, value, mono = false }) {
   return (
     <div className="bg-mist rounded-2xl px-4 py-3.5 border border-[#E1EAF2]">
@@ -586,7 +586,7 @@ function Ring({ value, color, size = 104 }) {
   );
 }
 
-// Half-circle tilt dial: coloured angle bands + animated needle.
+// gauge
 function TiltDial({ tilt, color }) {
   const cx = 150,
     cy = 150,
@@ -671,7 +671,7 @@ function PipelineStrip({ steps }) {
 // ───────────────────────── LIVE DASHBOARD ─────────────────────────
 function LiveDashboard({ wearerName, onEndSession }) {
   const [serverStatus, setServerStatus] = useState("connecting"); // connecting | ok | offline
-  const [deviceLive, setDeviceLive] = useState(false);
+  const [deviceLive, setDeviceLive] = useState(false);  // true if /latest is returning new MQTT messages
   const [classes, setClasses] = useState([]);
   const [sensor, setSensor] = useState({ ax: 0, ay: 1, az: 0, gx: 0, gy: 0, gz: 0, mag: 1 });
   const [trace, setTrace] = useState([]); // last 8 s of samples (for the live charts)
@@ -679,7 +679,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   const [predTotal, setPredTotal] = useState(0);
   const [prediction, setPrediction] = useState(null);
   const [history, setHistory] = useState([]);
-  const [decision, setDecision] = useState({
+  const [decision, setDecision] = useState({   //Starting values before data arrives
     level: 0,
     title: "UPRIGHT",
     why: "Waiting for sensor data…",
@@ -702,7 +702,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
 
   const bufferRef = useRef([]);
   const sampleCountRef = useRef(0);
-  const engineRef = useRef(createPostureEngine());
+  const engineRef = useRef(createPostureEngine());  //Engine object
   const predictionRef = useRef(null);
   const lastLevelRef = useRef(-1);
   const predInFlightRef = useRef(false);
@@ -758,7 +758,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   // /latest every 100 ms → posture decision + sliding window + /predict
   useEffect(() => {
     let cancelled = false;
-
+{/*call to the engine*/}
     async function tick() {
       try {
         const data = await fallApi.latest();
@@ -843,7 +843,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
   const ev = EVENT_STYLE[ctx?.event] || null;
   const riskKey = ctx?.risk_level || "unknown";
   const serverOk = serverStatus === "ok";
-
+{/*logic of badges */}
   const deviceDot = !serverOk ? "#F04438" : deviceLive ? "#2BE08A" : "#F5A623";
   const deviceText = !serverOk ? "Device: no server" : deviceLive ? "Device live" : "Device silent";
   const serverDot = serverOk ? "#2BE08A" : serverStatus === "offline" ? "#F04438" : "#F5A623";
@@ -938,6 +938,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         <div className="container-xl relative">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
+              {/* ───────── end session button ───────── */}
               <button
                 onClick={onEndSession}
                 className="flex items-center gap-2 text-base font-medium text-white/85 hover:text-white mb-3 transition-colors"
@@ -951,7 +952,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
                 Live fall detection
               </p>
             </div>
-
+            {/* ───────── badges ───────── */}
             <div className="flex flex-wrap items-center gap-3">
               <StatusChip color={deviceDot}>{deviceText}</StatusChip>     
               <StatusChip color={serverDot}>{serverText}</StatusChip>
@@ -966,7 +967,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
         </div>
       </div>
 
-      {/* Server-offline help */}
+      {/* Server-offline */}
       {serverStatus === "offline" && (
         <div className="bg-[#FFF3D6] border-b border-[#F2D58A]">
           <div className="container-xl py-3 flex items-center gap-3 text-base font-medium text-[#6B4300]">
@@ -1034,6 +1035,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
               background: decision.level > 0 ? `${decision.hex}12` : "#FFFFFF"
             }}
           >
+            {/*Title*/}
             <p
               className="font-display text-3xl md:text-4xl font-bold leading-tight text-center"
               style={{ color: levelText }}
@@ -1041,9 +1043,9 @@ function LiveDashboard({ wearerName, onEndSession }) {
               {decision.title}
             </p>
             
-
+{/*use TiltDial function to display the tilt angle*/}
             <TiltDial tilt={decision.tilt} color={decision.hex} />
-
+{/*why message*/}
             <p className="mt-5 text-lg text-ink leading-relaxed bg-white rounded-2xl p-4 border border-[#D6E3EF]">
               {decision.why}
             </p>
@@ -1053,7 +1055,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
               </p>
             )}
 
-            {/* the evidence behind the decision */}
+            {/* 4 tiles - the evidence behind the decision */}
             <div className="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-3">
               <Tile label="Tilt angle" value={`${ev8.tilt.toFixed(0)}°`} mono />
               <Tile label="Angular velocity" value={`${ev8.gyro.toFixed(0)} °/s`} mono />
@@ -1078,7 +1080,7 @@ function LiveDashboard({ wearerName, onEndSession }) {
               </div>
             )}
 
-            {/* level guide: the active row is highlighted */}
+            {/* 6 level boxes*/}
             <div className="mt-5 grid sm:grid-cols-2 gap-3 flex-1 content-end">
               {[
                 { range: `under ${L.slightTilt}°`, text: "Standing normally" },
