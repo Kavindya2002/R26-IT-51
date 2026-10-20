@@ -1,15 +1,13 @@
-# Trains the blood-pressure model and saves it as bp_model.joblib (next to this file).
-#   python train_model.py
 # Input : collected_data.csv  (Red_Raw, IR_Raw, BPM, PulseInterval_ms -> Systolic_BP, Diastolic_BP)
 from pathlib import Path
-
 import joblib
-import pandas as pd
+import pandas as pd   #read csv file
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
+import numpy as np
 
-BASE = Path(__file__).resolve().parent
+BASE = Path(__file__).resolve().parent   #variable bae store this file+csv
 
 # Data load
 df = pd.read_csv(BASE / "collected_data.csv")
@@ -41,3 +39,5 @@ print("=" * 40)
 print(f"Systolic BP Error (MAE) : {mae_sys:.2f} mmHg")
 print(f"Diastolic BP Error (MAE): {mae_dia:.2f} mmHg")
 print("=" * 40)
+
+
